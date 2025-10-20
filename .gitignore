@@ -1,0 +1,7 @@
+__pycache__/
+
+src/amazon/__pycache__/
+
+src/face_alignment/__pycache__/
+
+.vscode/
