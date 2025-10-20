@@ -5,14 +5,14 @@ import face_alignment
 import boto3
 import cv2
 
-#cfp_images_path = "/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images"
-cfp_images_path = "F:\\Bases\\cfp-dataset\\Data\\Images"
+cfp_images_path = "/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images"
+#cfp_images_path = "F:\\Bases\\cfp-dataset\\Data\\Images"
 
 def get_images_paths():
     images_paths = []
     for current_folder in os.listdir(cfp_images_path):
         for i in range(1, 5):
-            images_paths.append(f"{cfp_images_path}\\{current_folder}\\profile\\0{i}.jpg")
+            images_paths.append(f"{cfp_images_path}/{current_folder}/profile/0{i}.jpg")
     return images_paths
 
 def get_ground_truth_path(image_path):
