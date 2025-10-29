@@ -19,10 +19,11 @@ def get_ground_truth_path(image_path):
     return image_path.replace("Images", "Fiducials").replace("jpg", "txt")
 
 def get_ground_truth_points(image_path):
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
     ground_truth_path = get_ground_truth_path(image_path)
     ground_truth_points_list = []
-   
-    image = Image.open(image_path)
 
     if os.path.exists(ground_truth_path):
         with open(ground_truth_path, 'r') as file:
@@ -33,10 +34,14 @@ def get_ground_truth_points(image_path):
                 y = float(y)
                 ground_truth_points_list.append((x, y))
 
-    width = image.size[0]
+    width = image.shape[1]
+    right_side = verifies_img_side(ground_truth_points_list, width)
+
+    if not right_side:
+        ground_truth_points_list = [ (width - x, y) for x, y in ground_truth_points_list]
+        image = cv2.flip(image, 1)
    
-    
-    return ground_truth_points_list
+    return ground_truth_points_list, image
 
 def verifies_img_side(ground_truth_points, width):
     #print(f"Largura: {width}")

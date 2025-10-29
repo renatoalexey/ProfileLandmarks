@@ -1,22 +1,22 @@
-import utils.cfp as cfp
-import utils.core as core
-from correspondent_amazon_type import CorrespondentAmazon
+import cv2
+from src.utils import cfp
+from src.utils import core
+from .correspondent_amazon_type import CorrespondentAmazon
+from src.utils.face_type import FaceType
 
 def run():
     image_path_list = cfp.get_images_paths()
 
     for image_path in image_path_list:
-        amazon_points_list = core.get_amazon_points(image_path)
+        
+        ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)
 
-        face_detected = False
+        amazon_points_list, face_detected = core.get_amazon_points(image, image_path)
+
         distances_list = []
-
-        if amazon_points_list:
-            face_detected = True
-            ground_truth_points_list = cfp.get_ground_truth_points(image_path)
+        if face_detected == FaceType.ONE:
             correspondent_points_list = CorrespondentAmazon.CFP.points
             distances_list = core.compare_points(ground_truth_points_list, amazon_points_list, correspondent_points_list)
-        
-    core.writes_euclidean_distances(image_path, face_detected, distances_list, "cfp_amazon_result")
+        core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_amazon_result.txt")
 
         

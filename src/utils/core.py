@@ -3,7 +3,7 @@ from PIL import Image
 import face_alignment
 import boto3
 import cv2
-from src.face_alignment.face_type import FaceType
+from .face_type import FaceType
 
 rekognition = boto3.client("rekognition", region_name="us-east-1")
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
@@ -66,7 +66,7 @@ def get_face_alignment_points(image):
         print("Erro:", e)
         return fa_points_list, FaceType.NONE
 
-def get_amazon_points(image_path):
+def get_amazon_points(img, image_path):
     with open(image_path, "rb") as img_file:
         img_bytes = img_file.read()
 
@@ -76,16 +76,22 @@ def get_amazon_points(image_path):
         Attributes=['ALL']
     )
 
-    img = cv2.imread(image_path)
-    h, w, _ = img.shape
+    
+    faceDetails = response["FaceDetails"]
+    face_detected = FaceType.ONE
+
+    if len(faceDetails) == 0:
+        face_detected = FaceType.NONE
+    elif len(faceDetails) > 1:
+        face_detected = FaceType.MULTIPLE
 
     amazon_pts = []
-    #print(f"Qte de faces: {response["FaceDetails"]}")
-    # --- Para cada rosto detectado ---
-    for face in response["FaceDetails"]:
+    h, w, _ = img.shape
+
+    for face in faceDetails:
         for landmark in face["Landmarks"]:
             x = float(landmark["X"] * w)
             y = float(landmark["Y"] * h)
             amazon_pts.append((x, y))
 
-    return amazon_pts
+    return amazon_pts, face_detected
