@@ -3,10 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-def print_graph(means, graph_name, positions=None):
+file_library_name = {"cfp_fa_result.txt": "Face Alignment", "cfp_mlkit_result.txt": "ML Kit", "cfp_amazon_result.txt": "Amazon Rekognition"}
+
+def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
     plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions)
-    plt.xlabel('Bibiotecas')
+    plt.xlabel(x_label)
     plt.ylabel('Média das distâncias normalizadas entre os pontos (groud truth e biblioteca)')
     plt.savefig(f'{graph_name}.png')
 
@@ -64,10 +66,11 @@ def all_distances_boxplot():
                 soma_key = int( soma/100 + 1) * 100
             distances_tools_list.append(distance_means)
             
-    print_graph(distances_tools_list, "distances_4", ["Face Alignment", "ML Kit"])
+    print_graph(distances_tools_list, "distances_5", ["Face Alignment", "ML Kit", "Amazon Rekognition"], "Bibliotecas")
 
 def distances_per_point(file_path):
     lines = get_file_lines(file_path)
+    #keys = [4, 7, 9, 10, 11, 12, 13, 16, 17, 21, 24, 25, 26]
     keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 17, 18, 19, 20, 21, 22, 25, 28, 26, 29]
     point_distances_list = []
     for line in lines:
@@ -82,7 +85,8 @@ def distances_per_point(file_path):
                 point_distances_list.append([])
             point_distances_list[i].append(distance)
 
-    print_graph(point_distances_list, "points_distances", keys)
+    label = get_library_from_path(file_path)
+    print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
 
 def distances_per_resolution_area(file_path):
     resolution_distances = {}
@@ -112,7 +116,8 @@ def distances_per_resolution_area(file_path):
     print(f"Resolution min: {min(resolution_area_list)}")
     print(f"Resolution max: {max(resolution_area_list)}")
     print(f"Resolution distances: {resolution_distances}")
-    print_graph(list(resolution_distances.values()), "resolutions_distances_new", list(resolution_distances.keys()))
+    label = get_library_from_path(file_path)
+    print_graph(list(resolution_distances.values()), f"resolutions_distances_new_{label}", list(resolution_distances.keys()), "Resolutions")
 
 def get_rel_interval(file_path):
     resolution_area_list = []
@@ -139,7 +144,7 @@ def accuracy_face_per_resolution():
         
         lines = get_file_lines(file_path)
 
-        resolution_distances = {}
+        resolution_distance_list = {}
         for line in lines:
             if line == '':
                 continue
@@ -149,20 +154,21 @@ def accuracy_face_per_resolution():
             face_detected = get_face_detected(line)
             area_key = int( resolution_area/200000 + 1) * 200000
             
-            if area_key in resolution_distances:
-                resolution_distances[area_key].append(face_detected)
+            if area_key in resolution_distance_list:
+                resolution_distance_list[area_key].append(face_detected)
             else:
-                resolution_distances[area_key] = [face_detected]
+                resolution_distance_list[area_key] = [face_detected]
 
         arrei = []
-        for teste in list(resolution_distances.values()):
-            count_truth = teste.count('True')
-            arrei.append( round(count_truth * 100 / len(teste), 2))
+        for resolution_distance in list(resolution_distance_list.values()):
+            count_truth = resolution_distance.count('True')
+            arrei.append( round(count_truth * 100 / len(resolution_distance), 2))
 
-        x_keys = sorted(list(resolution_distances.keys()))
+        x_keys = sorted(list(resolution_distance_list.keys()))
         #plt.plot(list(map(lambda x: str(int(x/10000)), x_keys)), arrei, label=file_path, marker='o')
-        plt.plot(x_keys, arrei, label=file_path, marker='o')
-    blabla = list(map(lambda x: str(int(x/10000)), x_keys))
+        label = get_library_from_path(file_path)
+        plt.plot(x_keys, arrei, label=label, marker='o')
+    
     #plt.xticks(range(len(blabla)), blabla)
     plt.xticks(x_keys)
     #plt.xticks(blabla)
@@ -173,6 +179,12 @@ def accuracy_face_per_resolution():
     # Mostra o gráfico
     #plt.show()
     plt.savefig('accuracy_face.png')
+
+def get_library_from_path(file_path):
+    file_name = file_path[file_path.find("/") + 1:]
+    label = file_library_name[file_name]
+    return label
+
 
 def run():
     resolution_distances = {}
@@ -205,8 +217,8 @@ def run():
 
 file_path = "output/cfp_fa_result.txt"
 
-#distances_per_resolution_area(file_path)
-#distances_per_point(file_path)
+distances_per_resolution_area(file_path)
+distances_per_point(file_path)
 #all_distances_boxplot()
-accuracy_face_per_resolution()
+#accuracy_face_per_resolution()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")
