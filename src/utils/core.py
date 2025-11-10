@@ -8,8 +8,11 @@ from .face_type import FaceType
 rekognition = boto3.client("rekognition", region_name="us-east-1")
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
 
-def compare_points(ground_truth_pts, library_pts, correspondet_points, vertical_distance=1, horizontal_distance=1):
+def get_euclidean_results(ground_truth_pts, library_pts, correspondet_points, image, vertical_distance=1, horizontal_distance=1):
     all_distances = []
+
+    height, width = image.shape[:2]
+    resolution = height * width
 
     for i, groud_truth_point in enumerate(ground_truth_pts, start=1):
         if correspondet_points.get(i) is not None:
@@ -17,13 +20,14 @@ def compare_points(ground_truth_pts, library_pts, correspondet_points, vertical_
                 fa_point = library_pts[correspondet_points.get(i)]
                 distance = calc_euclidean_distance(groud_truth_point[0], groud_truth_point[1],
                         fa_point[0], fa_point[0], vertical_distance, horizontal_distance)    
-                all_distances.append(distance)
+                # Dividindo pela área da imagem para normalizar e multiplicando por 1000 para evitar números muito pequenos
+                all_distances.append(distance * 1000 / resolution)
             except IndexError as e:
                 print(f"Erro: {e}")
                 print(f"Valor do i: {i} ### valor do correspondente: {correspondet_points.get(i)}")
+                return []
                 
-    max_distance = max(all_distances)
-    all_distances = [distance / max_distance for distance in all_distances]
+    #all_distances = [distance / max_distance for distance in all_distances]
     return all_distances
 
 def calc_euclidean_distance(x1, y1, x2, y2, vertical_distance=1, horizontal_distance=1):

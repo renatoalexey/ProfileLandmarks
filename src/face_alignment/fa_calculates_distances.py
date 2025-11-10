@@ -16,22 +16,12 @@ def run():
 
     for i, image_path in enumerate(image_path_list):
         
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        ground_truth_points_list = cfp.get_ground_truth_points(image_path)
-        
-        width = image.shape[1]
-        right_side = cfp.verifies_img_side(ground_truth_points_list, width)
-    
-        if not right_side:
-            ground_truth_points_list = [ (width - x, y) for x, y in ground_truth_points_list]
-            image = cv2.flip(image, 1)
+        ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)
             
         fa_points_list, face_detected = core.get_face_alignment_points(image)
-        distances_list = []
+
         if face_detected == FaceType.ONE:
-            correspondent_points_list = CorrespondentFaceAlignment.CFP.points
-            distances_list = core.compare_points(ground_truth_points_list, fa_points_list[0], correspondent_points_list)
+            distances_list = core.get_euclidean_results(ground_truth_points_list, fa_points_list[0], CorrespondentFaceAlignment.CFP.points, image)
         core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_fa_result.txt")
 
 if os.path.exists('output/cfp_fa_result.txt'):

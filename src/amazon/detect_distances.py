@@ -16,7 +16,7 @@ def run():
         distances_list = []
         if face_detected == FaceType.ONE:
             correspondent_points_list = CorrespondentAmazon.CFP.points
-            distances_list = core.compare_points(ground_truth_points_list, amazon_points_list, correspondent_points_list)
+            distances_list = core.get_euclidean_results(ground_truth_points_list, amazon_points_list, correspondent_points_list)
         core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_amazon_result.txt")
 
         
