@@ -1,6 +1,5 @@
-import matplotlib as plt
 import matplotlib.patches as patches
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import numpy as np
 from . import cfp
 from . import core
@@ -8,7 +7,7 @@ from src.face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
 from .face_type import FaceType
 
 def fiducial_points(image, ground_truth_points, library_points, correspondent_points, save_path):
-
+    plt.clf()
     plt.imshow(image)
     for i, ground_truth_point in enumerate(ground_truth_points, start=0):
         if correspondent_points.get(i) is not None:
@@ -25,8 +24,9 @@ def fiducial_points(image, ground_truth_points, library_points, correspondent_po
         plt.axis("off")
         plt.savefig(save_path)
         
-def bounding_boxes(image, library_points_list):
-    fig, ax = pyplot.subplots()
+def bounding_boxes(image, library_points_list, output_path):
+    plt.clf()
+    fig, ax = plt.subplots()
     ax.imshow(image)   
     #plt.imshow(image)
     for library_points in library_points_list:
@@ -51,20 +51,31 @@ def bounding_boxes(image, library_points_list):
 
         ax.add_patch(rectangle)
     
-    pyplot.axis("off")
-    pyplot.show()
+    plt.axis("off")
+    #pyplot.show()
+    plt.savefig(output_path)
+    plt.close()
 
-ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\446\\profile\\04.txt'
-img_path = core.get_image_path(ground_truth_file_path)
+#ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\446\\profile\\04.txt'
+#img_path = core.get_image_path(ground_truth_file_path)
 
 def tests_face_alignment():
-    ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
-            
-    fa_points_list, face_detected = core.get_face_alignment_points(image)
+    output_path = "output/face_alignment/"
+    #ground_truth_file_path = 
+    images_paths = ['/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/446/profile/04.jpg',
+                    '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/001/profile/01.jpg']
+    
+    for img_path in images_paths:
+        ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
+                
+        fa_points_list, face_detected = core.get_face_alignment_points(image)
 
-    correspondent_points = CorrespondentFaceAlignment.CFP.points
-    if face_detected == FaceType.ONE:
-        fiducial_points(ground_truth_points_list, fa_points_list, correspondent_points, "output/face_alignment")
-    elif face_detected == FaceType.MULTIPLE:
-        bounding_boxes(image, fa_points_list)
-tests_face_alignment()
+        correspondent_points = CorrespondentFaceAlignment.CFP.points
+        img_suffix = img_path[img_path.index("Images") + 7: len(img_path)].replace("/", "_")
+        print(f"{output_path}{img_suffix}")
+
+        if face_detected == FaceType.ONE:
+            fiducial_points(image, ground_truth_points_list, fa_points_list, correspondent_points, f"{output_path}{img_suffix}")
+        elif face_detected == FaceType.MULTIPLE:
+            bounding_boxes(image, fa_points_list, f"{output_path}{img_suffix}")
+#tests_face_alignment()

@@ -4,6 +4,7 @@ import face_alignment
 import boto3
 import cv2
 from .face_type import FaceType
+import traceback
 
 rekognition = boto3.client("rekognition", region_name="us-east-1")
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
@@ -25,6 +26,7 @@ def get_euclidean_results(ground_truth_pts, library_pts, correspondet_points, im
             except IndexError as e:
                 print(f"Erro: {e}")
                 print(f"Valor do i: {i} ### valor do correspondente: {correspondet_points.get(i)}")
+                #traceback.print_exc()
                 return []
                 
     #all_distances = [distance / max_distance for distance in all_distances]
