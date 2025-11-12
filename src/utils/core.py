@@ -57,14 +57,13 @@ def get_image_path(fiducials_file_path):
 def get_face_alignment_points(image):
     fa_points_list = []
     try:
-        face_detected = FaceType.ONE
         fa_points_list = fa.get_landmarks(image)
         
         if fa_points_list is None:
-            face_detected = FaceType.NONE 
+            return [], FaceType.NONE 
         elif len(fa_points_list) > 1:
-            face_detected = FaceType.MULTIPLE
-        return fa_points_list, face_detected
+            return fa_points_list, FaceType.MULTIPLE
+        return fa_points_list[0], FaceType.ONE
         
     except Exception as e:
         print("Erro:", e)
@@ -82,14 +81,13 @@ def get_amazon_points(img, image_path):
 
     
     faceDetails = response["FaceDetails"]
-    face_detected = FaceType.ONE
-
-    if len(faceDetails) == 0:
-        face_detected = FaceType.NONE
-    elif len(faceDetails) > 1:
-        face_detected = FaceType.MULTIPLE
-
     amazon_pts = []
+    
+    if len(faceDetails) == 0:
+        return amazon_pts, FaceType.NONE
+    elif len(faceDetails) > 1:
+        return amazon_pts, FaceType.MULTIPLE
+
     h, w, _ = img.shape
 
     for face in faceDetails:
@@ -98,4 +96,10 @@ def get_amazon_points(img, image_path):
             y = float(landmark["Y"] * h)
             amazon_pts.append((x, y))
 
-    return amazon_pts, face_detected
+    return amazon_pts, FaceType.ONE
+
+def save_results_library(ground_truth_points_list, libray_points_list, correspondent_points_list,
+                         face_detected, image, image_path):
+    if face_detected == FaceType.ONE:
+        distances_list = get_euclidean_results(ground_truth_points_list, libray_points_list, correspondent_points_list, image)
+    writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_fa_result.txt")

@@ -5,8 +5,8 @@ import face_alignment
 import boto3
 import cv2
 
-cfp_images_path = "/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images"
-#cfp_images_path = "F:\\Bases\\cfp-dataset\\Data\\Images"
+#cfp_images_path = "/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images"
+cfp_images_path = "F:\\Bases\\cfp-dataset\\Data\\Images"
 
 def get_images_paths():
     images_paths = []
