@@ -11,8 +11,8 @@ from .amazon.correspondent_amazon_type import CorrespondentAmazon
 from .face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
 from PIL import Image
 
-#ground_truth_file_path = '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Fiducials/446/profile/04.txt'
-ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\291\\profile\\02.txt'
+ground_truth_file_path = '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Fiducials/430/profile/03.txt'
+#ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\291\\profile\\02.txt'
 img_path = core.get_image_path(ground_truth_file_path)
 
 def tests_face_alignment():
@@ -96,6 +96,6 @@ def print_points(fiducial_points, plt, color='red'):
     return plt 
 
 
-tests_face_alignment()
-#tests_amazon()
+#tests_face_alignment()
+tests_amazon()
 

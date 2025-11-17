@@ -2,6 +2,7 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from src.face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
 
 file_library_name = {"cfp_fa_result.txt": "Face Alignment", "cfp_mlkit_result.txt": "ML Kit", "cfp_amazon_result.txt": "Amazon Rekognition"}
 
@@ -51,6 +52,8 @@ def all_distances_boxplot():
     output_path = 'output'
     distances_tools_list = []
     for result_file in os.listdir(output_path):
+        if os.path.isdir(os.path.join(output_path, result_file)):
+            continue
         distance_means = []
         result_file_full_path = os.path.join(output_path, result_file)
         with open(result_file_full_path, 'r') as file:
@@ -71,10 +74,10 @@ def all_distances_boxplot():
             
     print_graph(distances_tools_list, "distances_5", ["Face Alignment", "ML Kit", "Amazon Rekognition"], "Bibliotecas")
 
-def distances_per_point(file_path):
+def distances_per_point(file_path, keys):
     lines = get_file_lines(file_path)
     #keys = [4, 7, 9, 10, 11, 12, 13, 16, 17, 21, 24, 25, 26]
-    keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 17, 18, 19, 20, 21, 22, 25, 28, 26, 29]
+    #keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 17, 18, 19, 20, 21, 22, 25, 28, 26, 29]
     point_distances_list = []
     for line in lines:
         if line == '':
@@ -89,7 +92,7 @@ def distances_per_point(file_path):
             point_distances_list[i].append(distance)
 
     label = get_library_from_path(file_path)
-    print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
+    print_graph(point_distances_list, f"points_distances_{label}_3", keys, "Points")
 
 def distances_per_resolution_area(file_path):
     resolution_distances = {}
@@ -145,7 +148,8 @@ def accuracy_face_per_resolution():
     rels_interval_list = get_rel_interval(all_files[0])
     x_keys = []
     for file_path in all_files:
-        
+        if os.path.isdir(file_path):
+            continue
         lines = get_file_lines(file_path)
 
         resolution_distance_list = {}
@@ -181,7 +185,7 @@ def accuracy_face_per_resolution():
 
         values = []
         for resolution_distance in list(resolution_distance_list.values()):
-            count_truth = resolution_distance.count('True')
+            count_truth = resolution_distance.count('True') + resolution_distance.count('Multiple')
             values.append( round(count_truth * 100 / len(resolution_distance), 2))
 
         x_keys = list(resolution_distance_list.keys())
@@ -198,7 +202,7 @@ def accuracy_face_per_resolution():
     #plt.grid(True)
     # Mostra o gráfico
     #plt.show()
-    plt.savefig('accuracy_face.png')
+    plt.savefig('accuracy_face_2.png')
 
 def get_library_from_path(file_path):
     file_name = file_path[file_path.find("/") + 1:]
@@ -238,7 +242,7 @@ def run():
 file_path = "output/cfp_fa_result.txt"
 
 #distances_per_resolution_area(file_path)
-#distances_per_point(file_path)
+distances_per_point(file_path, list(CorrespondentFaceAlignment.CFP.points.keys()))
 #all_distances_boxplot()
-accuracy_face_per_resolution()
+#accuracy_face_per_resolution()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")

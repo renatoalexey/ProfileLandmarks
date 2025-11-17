@@ -81,25 +81,28 @@ def get_amazon_points(img, image_path):
         Image={'Bytes': img_bytes},
         Attributes=['ALL']
     )
-
     
     faceDetails = response["FaceDetails"]
     amazon_pts = []
+    faces_detected = FaceType.ONE
     
     if len(faceDetails) == 0:
-        return amazon_pts, FaceType.NONE
+        faces_detected = FaceType.NONE
+        return [[]], faces_detected
     elif len(faceDetails) > 1:
-        return amazon_pts, FaceType.MULTIPLE
+        faces_detected = FaceType.MULTIPLE
 
     h, w, _ = img.shape
 
-    for face in faceDetails:
+    for i, face in enumerate(faceDetails):
+        points_temp = []
         for landmark in face["Landmarks"]:
             x = float(landmark["X"] * w)
             y = float(landmark["Y"] * h)
-            amazon_pts.append((x, y))
+            points_temp.append((x, y))
+        amazon_pts.append(points_temp)
 
-    return amazon_pts, FaceType.ONE
+    return amazon_pts, faces_detected
 
 def save_results_library(ground_truth_points_list, libray_points_list, correspondent_points_list,
                          face_detected, image, image_path):

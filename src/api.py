@@ -99,6 +99,7 @@ def get_compare_results():
                 distances_list.append(core.get_euclidean_results(ground_truth_points_list, face_points, correspondet_points, image))
     else: 
         print("Nenhuma face")
+        distances_list = [[]]
         face_detected = FaceType.NONE
 
     core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_mlkit_result.txt")
