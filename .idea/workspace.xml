@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="75c11ac2-9d32-4b20-8be7-0bc533d84f73" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/output/cfp_fa_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output/cfp_fa_result.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/face_alignment/173_profile_04.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/output/face_alignment/173_profile_04.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/face_alignment/fa_calculates_distances.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/face_alignment/fa_calculates_distances.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/cfp.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/cfp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/save_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/save_images.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="35RZEoRjvofLfsoswnlraF2j1QX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "android.gradle.sync.needed": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="75c11ac2-9d32-4b20-8be7-0bc533d84f73" name="Changes" comment="" />
+      <created>1763074746502</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763074746502</updated>
+    </task>
+    <servers />
+  </component>
+</project>

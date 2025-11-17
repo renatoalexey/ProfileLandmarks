@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")   # backend sem interface gráfica
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,7 +26,7 @@ def fiducial_points(image, ground_truth_points, library_points, correspondent_po
         plt.axis("off")
         plt.savefig(save_path)
         
-def bounding_boxes(image, library_points_list, output_path):
+def bounding_boxes(image, library_points_list, output_path=None):
     plt.clf()
     fig, ax = plt.subplots()
     ax.imshow(image)   
@@ -52,18 +54,18 @@ def bounding_boxes(image, library_points_list, output_path):
         ax.add_patch(rectangle)
     
     plt.axis("off")
-    #pyplot.show()
     plt.savefig(output_path)
+    #plt.show()
     plt.close()
 
 #ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\446\\profile\\04.txt'
+#ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\085\\profile\\01.txt'
 #img_path = core.get_image_path(ground_truth_file_path)
 
 def tests_face_alignment():
     output_path = "output/face_alignment/"
     #ground_truth_file_path = 
-    images_paths = ['/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/446/profile/04.jpg',
-                    '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/001/profile/01.jpg']
+    images_paths = ['F:\\Bases\\cfp-dataset\\Data\\Images\\085\\profile\\01.jpg']
     
     for img_path in images_paths:
         ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
@@ -77,5 +79,20 @@ def tests_face_alignment():
         if face_detected == FaceType.ONE:
             fiducial_points(image, ground_truth_points_list, fa_points_list, correspondent_points, f"{output_path}{img_suffix}")
         elif face_detected == FaceType.MULTIPLE:
-            bounding_boxes(image, fa_points_list, f"{output_path}{img_suffix}")
+            for fa_p in fa_points_list:
+                if teste(image, fa_p):
+                    bounding_boxes(image, fa_points_list)
+
+def teste(image, library_points_list):
+    image_height, image_width = image.shape[:2]
+    
+    x_min = np.min(library_points_list[:, 0])
+    y_min = np.min(library_points_list[:, 1])
+    x_max = np.max(library_points_list[:, 0])
+    y_max = np.max(library_points_list[:, 1])
+
+    width = x_max - x_min
+    height = y_max - y_min
+
+    return width * height > 0.2 * ( image_height * image_width )
 #tests_face_alignment()

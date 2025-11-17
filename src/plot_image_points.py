@@ -12,13 +12,14 @@ from .face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
 from PIL import Image
 
 #ground_truth_file_path = '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Fiducials/446/profile/04.txt'
-ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\446\\profile\\04.txt'
+ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\291\\profile\\02.txt'
 img_path = core.get_image_path(ground_truth_file_path)
 
 def tests_face_alignment():
     ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
             
     fa_points_list, face_detected = core.get_face_alignment_points(image)
+
 
     correspondent_points = CorrespondentFaceAlignment.CFP.points
     if face_detected == FaceType.ONE:
@@ -27,9 +28,9 @@ def tests_face_alignment():
         print('adsf')
   
     color = image.shape[2]
-    print(f"Color: {color}")
+    print(f"Fa: {fa_points_list}  {face_detected}")
         
-    prints_graphic(image, fa_points_list[0], correspondent_points, ground_truth_points_list)
+    #prints_graphic(image, fa_points_list[0], correspondent_points, ground_truth_points_list)
    
 def tests_amazon():
     amazon_points = core.get_amazon_points(img_path)
@@ -81,7 +82,7 @@ def prints_graphic(img, library_points, correspondent_points, ground_truth_point
         
         plt.imshow(img)
         plt.axis("off")
-        plt.show()
+        #plt.show()
 
 def print_points(fiducial_points, plt, color='red'):
     for i, fiducial_point in enumerate(fiducial_points, start=1):

@@ -5,6 +5,7 @@ import boto3
 import cv2
 from .face_type import FaceType
 import traceback
+import numpy as np
 
 rekognition = boto3.client("rekognition", region_name="us-east-1")
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
@@ -43,13 +44,13 @@ def writes_euclidean_distances(image_path, face_detected, all_distances, file_pa
         color = image.mode
 
         #print(image_path)
-        img_index = image_path.index("Images")
-        msg = (
-            f"name: {image_path[img_index + 7:len(image_path)]}, resolution: {width}x{height}, color: {color}, face detected: {face_detected}, "
-            f"distances: {all_distances}, mean: { 0 if len(all_distances) == 0 else sum(all_distances) / len(all_distances)}\n"
-        )
-
-        file.write(msg)
+        for dists in all_distances:
+            img_index = image_path.index("Images")
+            msg = (
+                f"name: {image_path[img_index + 7:len(image_path)]}, resolution: {width}x{height}, color: {color}, face detected: {face_detected}, "
+                f"distances: {dists}, mean: { 0 if len(dists) == 0 else sum(dists) / len(dists)}\n"
+            )
+            file.write(msg)
 
 def get_image_path(fiducials_file_path):
     return fiducials_file_path.replace("Fiducials", "Images").replace("txt", "jpg")
@@ -105,3 +106,16 @@ def save_results_library(ground_truth_points_list, libray_points_list, correspon
     if face_detected == FaceType.ONE:
         distances_list = get_euclidean_results(ground_truth_points_list, libray_points_list, correspondent_points_list, image)
     writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_fa_result.txt")
+
+def valids_bounding_box(image, library_points_list):
+    image_height, image_width = image.shape[:2]
+    
+    x_min = np.min(library_points_list[:, 0])
+    y_min = np.min(library_points_list[:, 1])
+    x_max = np.max(library_points_list[:, 0])
+    y_max = np.max(library_points_list[:, 1])
+
+    width = x_max - x_min
+    height = y_max - y_min
+
+    return width * height > 0.2 * ( image_height * image_width )

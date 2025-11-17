@@ -1,9 +1,15 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 import os
 import json
 import ast
-import utils
 import sys
+from src.utils import cfp
+from src.utils import core
+from src.utils import save_images 
+from src.utils.face_type import FaceType
+from io import BytesIO
+from PIL import Image
+import numpy as np
 
 #sys.path.append(os.path.dirname(__file__))
 
@@ -29,49 +35,74 @@ def soma():
     b = int(request.args.get("b", 0))
     return jsonify({"resultado": a + b})
 
-@app.route("/ground/truth/points", methods=["GET"])
+@app.route("/image", methods=["GET"])
 def get_ground_truth_points():
-    fiducials_folder = str(request.args.get("fiducials_folder"))
-    ground_truth_pts = []
-
+    image_path = str(request.args.get("image_path"))
     #print(f"Fiducials folder: {fiducials_folder}")
-    
-    if os.path.exists(fiducials_folder):
-        with open(fiducials_folder, 'r') as file:
-            lines = file.readlines()
-            for line in lines:
-                x, y = line.split(',')
-                x = float(x)
-                y = float(y)
-                ground_truth_pts.append((x, y))
+    ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)   
 
-    return jsonify({"ground_truth_pt": ground_truth_pts})
+    # Converte o array NumPy em um objeto PIL
+    pil_img = Image.fromarray(image)
+
+    # Salva em memória como PNG
+    buffer = BytesIO()
+    pil_img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    # Retorna como resposta HTTP
+    #print(f"Image path: {image_path}")
+    #print(f"Ground truth: {ground_truth_points_list}")
+    return send_file(buffer, mimetype="image/png")
+
+    #return jsonify({"ground_truth_pt": ground_truth_pts})
 
 @app.route("/compare/points", methods=["GET"])
 def get_compare_results():
-    fiducials_file_path = request.args.get("fiducials_folder")
+    image_path = request.args.get("image_path")
     library_pts = request.args.get("library_pts")
     #print(f"Fiducial points: {fiducials_file_path}")
 
-    image_path = utils.get_image_path(fiducials_file_path)
     face_detected = False
     all_distances = []
     
     library_pts = ast.literal_eval(library_pts.strip("'"))
     #print(f"Library points: {library_pts}")
     
-    if library_pts:
-        face_detected = True
-        ground_truth_pts = get_gt_points(fiducials_file_path)
-        
-        vertical_distance = utils.calc_euclidean_distance(ground_truth_pts[vertical_point_a][0], ground_truth_pts[vertical_point_a][1],
-                                              ground_truth_pts[vertical_point_b][0], ground_truth_pts[vertical_point_b][1])
-        horizontal_distance = utils.calc_euclidean_distance(ground_truth_pts[horizontal_point_a][0], ground_truth_pts[horizontal_point_a][1],
-                                              ground_truth_pts[horizontal_point_b][0], ground_truth_pts[horizontal_point_b][1])
-        
-        all_distances = utils.compare_points(ground_truth_pts, library_pts, correspondet_points, vertical_distance, horizontal_distance)
+    ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)
+
+    img_suffix = image_path[image_path.index("Images") + 7: len(image_path)].replace("/", "_")
+    save_path = f"output/ml_kit/{img_suffix}"
     
-    utils.writes_euclidean_distances(image_path, face_detected, all_distances, file_path)
+    distances_list = []
+    size = len(library_pts)
+    print(f"Image path compare: {image_path}")
+    face_detected = FaceType.ONE
+    if  size == 1:
+        print("Uma face")
+        save_images.fiducial_points(image, ground_truth_points_list, library_pts[0], correspondet_points, save_path)
+        distances_list.append(core.get_euclidean_results(ground_truth_points_list, library_pts[0], correspondet_points, image))
+    elif size > 1:
+        print("Múltiplas face")
+        #print(library_pts)
+        face_detected = FaceType.MULTIPLE
+        #library_pts = [np.array(lib) for lib in library_pts]
+        library_pts = np.array(library_pts)
+        print(library_pts)
+        save_images.bounding_boxes(image, library_pts, save_path)
+        for face_points in library_pts:
+            pts = np.array(face_points)
+            #x_min, x_max = pts[:,0].min(), pts[:,0].max()
+            #y_min, y_max = pts[:,1].min(), pts[:,1].max()
+            face_points_list = [list(p) for p in face_points]
+            #print(face_points_list)
+            if core.valids_bounding_box(image, face_points):
+                distances_list.append(core.get_euclidean_results(ground_truth_points_list, face_points, correspondet_points, image))
+    else: 
+        print("Nenhuma face")
+        face_detected = FaceType.NONE
+
+    core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_mlkit_result.txt")
+    
     return jsonify({"teste": 123})
 
 def get_gt_points(fiducials_file_path):
@@ -91,7 +122,7 @@ def get_gt_points(fiducials_file_path):
 
     return ground_truth_pts
 
-file_path = "profile_results/cfp_mlkit_result.txt" 
+file_path = "output/cfp_mlkit_result.txt" 
 if os.path.exists(file_path):
     os.remove(file_path)    
 if __name__ == "__main__":
