@@ -23,6 +23,7 @@ def get_face_detected(line):
 
 def get_resolution_area(line): 
     match = re.search(r"resolution:[^,]*", line)
+    #return match.group()
     resolution_sum = match.group().split(":")[1].split("x")
     return int(resolution_sum[0].strip()) * int(resolution_sum[1].strip())
     
@@ -37,9 +38,9 @@ def get_distances(line):
         return distances
         #print(distances)
 
-def get_output_files():
+def get_result_files():
 
-    output_path = 'output'
+    output_path = 'result'
     files_names = os.listdir(output_path)
 
     return list(map(lambda f_name: f"{output_path}/{f_name}", files_names))
@@ -49,13 +50,13 @@ def get_file_lines(file_path):
         return file.readlines()
 
 def all_distances_boxplot():
-    output_path = 'output'
+    result_path = 'result'
     distances_tools_list = []
-    for result_file in os.listdir(output_path):
-        if os.path.isdir(os.path.join(output_path, result_file)):
+    for result_file in os.listdir(result_path):
+        if os.path.isdir(os.path.join(result_path, result_file)):
             continue
         distance_means = []
-        result_file_full_path = os.path.join(output_path, result_file)
+        result_file_full_path = os.path.join(result_path, result_file)
         with open(result_file_full_path, 'r') as file:
             lines = file.readlines()
             for line in lines:
@@ -99,6 +100,7 @@ def distances_per_resolution_area(file_path):
     lines = get_file_lines(file_path)
 
     resolution_area_list = []
+    distances_area_list = []
     for line in lines:
         if line == '':
             continue
@@ -107,26 +109,34 @@ def distances_per_resolution_area(file_path):
             continue
 
         dist_mean = np.mean(distances)
-        
+    
         #monta estrutura de distancia por resolucao
         resolution_area = get_resolution_area(line)
-        area_key = int( resolution_area/40000 + 1) * 40000
         
-        resolution_area_list.append(resolution_area)
+        distances_area_list.append((dist_mean, resolution_area))
 
-        if area_key in resolution_distances:
-            resolution_distances[area_key].append(dist_mean)
-        else:
-            resolution_distances[area_key] = [dist_mean]
-
-    print(f"Resolution min: {min(resolution_area_list)}")
-    print(f"Resolution max: {max(resolution_area_list)}")
-    print(f"Resolution distances: {resolution_distances}")
+    sorted_distances_area_list = sorted(distances_area_list, key=lambda x: x[1])
+    distances_temp = []
+    values = []
+    labels = []
+    for i, sorted_dist in enumerate(sorted_distances_area_list, start=1):
+        distances_temp.append(sorted_dist[0])
+        if i % 200 == 0:
+            labels.append(sorted_dist[1])
+            values.append(distances_temp)
+            distances_temp = []
+        
+    #print(f"Resolution min: {min(resolution_area_list)}")
+    #print(f"Resolution max: {max(resolution_area_list)}")
+    #print(f"Resolution distances: {resolution_distances}")
+    print(list(values))
+    print(labels)
     label = get_library_from_path(file_path)
-    print_graph(list(resolution_distances.values()), f"resolutions_distances_new_{label}", list(resolution_distances.keys()), "Resolutions")
+    print_graph(values, f"resolutions_distances_new_{label}_2", labels, "Resolutions")
 
 def get_rel_interval(file_path):
     resolution_area_list = []
+  
     with open(file_path, 'r') as file:
         lines = file.readlines()
         for line in lines:
@@ -141,74 +151,132 @@ def get_rel_interval(file_path):
     return sorted(resolution_area_list)
     #print(len(resolution_area_list))
 
-def accuracy_face_per_resolution():
+def teste():
+    file_path = "result/cfp_amazon_result.txt"
+    lines = get_file_lines(file_path)
+    amazon_names = []
+    for line in lines:
+        actual_img = get_image_name(line)
+        resolution_area = get_resolution_area(line)
+        amazon_names.append((actual_img, resolution_area))
 
-    all_files = get_output_files()
-    #all_files = ["output/cfp_fa_result.txt"]
+    file_path = "result/cfp_mlkit_result.txt"
+    lines = get_file_lines(file_path)
+    fa_names = []
+    for line in lines:
+        actual_img = get_image_name(line)
+        fa_names.append(actual_img)
+
+    for az in amazon_names:
+        if az[0] not in fa_names:
+            print(f"name: {az[0]}, {az[1]}, color: RGB, face detected: Multiple, distances: [], mean: 0")
+    
+def teste_2(): 
+    all_files = ["result/cfp_mlkit_result.txt"]
     rels_interval_list = get_rel_interval(all_files[0])
     x_keys = []
     for file_path in all_files:
-        if os.path.isdir(file_path):
-            continue
+        detected_area_list = []
         lines = get_file_lines(file_path)
 
         resolution_distance_list = {}
         teste = {}
+        before_img = ''
         for line in lines:
-            if line == '':
+            actual_img = get_image_name(line)
+            if line == '' or before_img == actual_img:
                 continue
-            
+            before_img = actual_img
             #monta estrutura de distancia por resolucao
             resolution_area = get_resolution_area(line)
             face_detected = get_face_detected(line)
-            area_key = int( resolution_area/200000 + 1) * 200000
-            img_name = get_image_name(line)
 
-            if area_key in resolution_distance_list:
-                resolution_distance_list[area_key].append(face_detected)
-                teste[area_key].append(f"{face_detected} - {img_name}")
-            else:
-                resolution_distance_list[area_key] = [face_detected]
-                teste[area_key] = [f"{face_detected} - {img_name}"]
-
-        resolution_distance_list = dict(sorted(resolution_distance_list.items()))
-        teste = dict(sorted(teste.items()))
-
-        if os.path.exists('faces_per_resolution.txt'):
-            os.remove('faces_per_resolution.txt')  
-        
-        with open('faces_per_resolution.txt', 'a') as file:
-            for t in teste:
-                file.write(f"{str(t)}: {str(teste[t])}")
-        #print(resolution_distance_list)
-        #print(resolution_distance_list)
-
+            detected_area_list.append((face_detected, resolution_area))
+            
+        sorted_distances_area_list = sorted(detected_area_list, key=lambda x: x[1])
+        detected_temp = []
         values = []
-        for resolution_distance in list(resolution_distance_list.values()):
-            count_truth = resolution_distance.count('True') + resolution_distance.count('Multiple')
-            values.append( round(count_truth * 100 / len(resolution_distance), 2))
-
-        x_keys = list(resolution_distance_list.keys())
+        labels = []
+        for i, sorted_dist in enumerate(sorted_distances_area_list, start=1):
+            detected_temp.append(sorted_dist[0])
+            if i % 200 == 0 :
+                labels.append(str(sorted_dist[1]))
+                values.append((detected_temp.count('True') + detected_temp.count('Multiple'))*100/len(detected_temp))
+                detected_temp = []
+            #if i == len(sorted_distances_area_list):
+             #   labels.append(f"> {labels[len(labels) - 1]}")
+            
+        img_name = get_image_name(line)
         #plt.plot(list(map(lambda x: str(int(x/10000)), x_keys)), arrei, label=file_path, marker='o')
         label = get_library_from_path(file_path)
-        plt.plot(x_keys, values, label=label, marker='o')
+        plt.plot(labels, values, label=label, marker='o')
     
     #plt.xticks(range(len(blabla)), blabla)
-    plt.xticks(x_keys)
+    print(labels)
+    plt.xticks(labels)
     #plt.xticks(blabla)
     plt.xlabel("Eixo X")
     plt.ylabel("Percentual de acerto")
     plt.legend()
     #plt.grid(True)
     # Mostra o gráfico
+    plt.show()
+    #plt.savefig('accuracy_face_3.png')
+    
+def accuracy_face_per_resolution():
+
+    all_files = get_result_files()
+    #all_files = ["result/cfp_fa_result.txt"]
+    rels_interval_list = get_rel_interval(all_files[0])
+    x_keys = []
+    for file_path in all_files:
+        detected_area_list = []
+        lines = get_file_lines(file_path)
+
+        resolution_distance_list = {}
+        teste = {}
+        before_img = ''
+        for line in lines:
+            actual_img = get_image_name(line)
+            if line == '' or before_img == actual_img:
+                continue
+            before_img = actual_img
+            #monta estrutura de distancia por resolucao
+            resolution_area = get_resolution_area(line)
+            face_detected = get_face_detected(line)
+
+            detected_area_list.append((face_detected, resolution_area))
+            
+        sorted_distances_area_list = sorted(detected_area_list, key=lambda x: x[1])
+        detected_temp = []
+        values = []
+        labels = []
+        for i, sorted_dist in enumerate(sorted_distances_area_list, start=1):
+            detected_temp.append(sorted_dist[0])
+            if i % 200 == 0:
+                labels.append(str(round(sorted_dist[1]/1000, 1)))
+                values.append((detected_temp.count('True') + detected_temp.count('Multiple'))*100/len(detected_temp))
+                detected_temp = []
+            
+        img_name = get_image_name(line)
+        #plt.plot(list(map(lambda x: str(int(x/10000)), x_keys)), arrei, label=file_path, marker='o')
+        label = get_library_from_path(file_path)
+        plt.plot(labels, values, label=label, marker='o')
+
+    #plt.xticks(range(len(blabla)), blabla)
+    print(labels)
+    plt.xticks(labels)
+    plt.xlabel("Eixo X")
+    plt.ylabel("Percentual de acerto")
+    plt.legend()
+    # Mostra o gráfico
     #plt.show()
-    plt.savefig('accuracy_face_2.png')
+    plt.savefig('accuracy_face_3.png')
 
 def get_library_from_path(file_path):
     file_name = file_path[file_path.find("/") + 1:]
     label = file_library_name[file_name]
     return label
-
 
 def run():
     resolution_distances = {}
@@ -239,10 +307,12 @@ def run():
 
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
-file_path = "output/cfp_fa_result.txt"
+file_path = "result/cfp_fa_result.txt"
 
 #distances_per_resolution_area(file_path)
-distances_per_point(file_path, list(CorrespondentFaceAlignment.CFP.points.keys()))
+#distances_per_point(file_path, list(CorrespondentFaceAlignment.CFP.points.keys()))
 #all_distances_boxplot()
-#accuracy_face_per_resolution()
+accuracy_face_per_resolution()
+#teste()
+#teste_2()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")
