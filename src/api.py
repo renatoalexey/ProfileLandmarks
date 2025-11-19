@@ -9,12 +9,12 @@ from src.utils import save_images
 from src.utils.face_type import FaceType
 from io import BytesIO
 from PIL import Image
+from src.mlkit.correspondent_mlkit_type import CorrespondentMLKit
 import numpy as np
 
 #sys.path.append(os.path.dirname(__file__))
 
 
-correspondet_points = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 10, 10: 18, 11: 20, 12: 23, 13: 37, 15: 38, 17: 40, 18: 48, 19: 28, 20: 29, 21: 30, 22: 31, 25: 32, 28: 53, 26: 49, 29: 13} 
 vertical_point_a = 11
 vertical_point_b = 8
 horizontal_point_a = 0
@@ -72,6 +72,7 @@ def get_compare_results():
 
     img_suffix = image_path[image_path.index("Images") + 7: len(image_path)].replace("/", "_")
     save_path = f"output/ml_kit/{img_suffix}"
+    correspondet_points = CorrespondentMLKit.CFP.points
     
     distances_list = []
     size = len(library_pts)
@@ -79,30 +80,24 @@ def get_compare_results():
     face_detected = FaceType.ONE
     if  size == 1:
         print("Uma face")
-        save_images.fiducial_points(image, ground_truth_points_list, library_pts[0], correspondet_points, save_path)
         distances_list.append(core.get_euclidean_results(ground_truth_points_list, library_pts[0], correspondet_points, image))
     elif size > 1:
-        print("Múltiplas face")
-        #print(library_pts)
+        print("Múltiplas face") # o mlkit repete os rostos!
         face_detected = FaceType.MULTIPLE
         #library_pts = [np.array(lib) for lib in library_pts]
+        library_pts = [x for x in library_pts if x]
         library_pts = np.array(library_pts)
-        print(library_pts)
-        save_images.bounding_boxes(image, library_pts, save_path)
-        for face_points in library_pts:
-            pts = np.array(face_points)
-            #x_min, x_max = pts[:,0].min(), pts[:,0].max()
-            #y_min, y_max = pts[:,1].min(), pts[:,1].max()
-            face_points_list = [list(p) for p in face_points]
-            #print(face_points_list)
-            if core.valids_bounding_box(image, face_points):
-                distances_list.append(core.get_euclidean_results(ground_truth_points_list, face_points, correspondet_points, image))
+        #save_images.bounding_boxes(image, library_pts, save_path)
+        face_points = library_pts[0]
+            
+        if core.valids_bounding_box(image, face_points):
+            save_images.fiducial_points(image, ground_truth_points_list, face_points, correspondet_points, save_path)
+            distances_list.append(core.get_euclidean_results(ground_truth_points_list, face_points, correspondet_points, image))
     else: 
         print("Nenhuma face")
-        distances_list = [[]]
         face_detected = FaceType.NONE
 
-    core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_mlkit_result.txt")
+    core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "result/cfp_mlkit_result.txt")
     
     return jsonify({"teste": 123})
 
@@ -123,7 +118,7 @@ def get_gt_points(fiducials_file_path):
 
     return ground_truth_pts
 
-file_path = "output/cfp_mlkit_result.txt" 
+file_path = "result/cfp_mlkit_result.txt" 
 if os.path.exists(file_path):
     os.remove(file_path)    
 if __name__ == "__main__":

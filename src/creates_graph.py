@@ -3,12 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from src.face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
+from src.mlkit.correspondent_mlkit_type import CorrespondentMLKit
+from src.amazon.correspondent_amazon_type import CorrespondentAmazon
 
 file_library_name = {"cfp_fa_result.txt": "Face Alignment", "cfp_mlkit_result.txt": "ML Kit", "cfp_amazon_result.txt": "Amazon Rekognition"}
 
 def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
-    plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions)
+    plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
     plt.ylabel('Média das distâncias normalizadas entre os pontos (groud truth e biblioteca)')
     plt.savefig(f'{graph_name}.png')
@@ -73,7 +75,7 @@ def all_distances_boxplot():
                 soma_key = int( soma/100 + 1) * 100
             distances_tools_list.append(distance_means)
             
-    print_graph(distances_tools_list, "distances_5", ["Face Alignment", "ML Kit", "Amazon Rekognition"], "Bibliotecas")
+    print_graph(distances_tools_list, "distances", ["Face Alignment", "ML Kit", "Amazon Rekognition"], "Bibliotecas")
 
 def distances_per_point(file_path, keys):
     lines = get_file_lines(file_path)
@@ -93,7 +95,7 @@ def distances_per_point(file_path, keys):
             point_distances_list[i].append(distance)
 
     label = get_library_from_path(file_path)
-    print_graph(point_distances_list, f"points_distances_{label}_3", keys, "Points")
+    print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
 
 def distances_per_resolution_area(file_path):
     resolution_distances = {}
@@ -132,7 +134,7 @@ def distances_per_resolution_area(file_path):
     print(list(values))
     print(labels)
     label = get_library_from_path(file_path)
-    print_graph(values, f"resolutions_distances_new_{label}_2", labels, "Resolutions")
+    print_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
 
 def get_rel_interval(file_path):
     resolution_area_list = []
@@ -271,7 +273,7 @@ def accuracy_face_per_resolution():
     plt.legend()
     # Mostra o gráfico
     #plt.show()
-    plt.savefig('accuracy_face_3.png')
+    plt.savefig('accuracy_face.png')
 
 def get_library_from_path(file_path):
     file_name = file_path[file_path.find("/") + 1:]
@@ -307,12 +309,12 @@ def run():
 
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
-file_path = "result/cfp_fa_result.txt"
+file_path = "result/cfp_amazon_result.txt"
 
 #distances_per_resolution_area(file_path)
-#distances_per_point(file_path, list(CorrespondentFaceAlignment.CFP.points.keys()))
+distances_per_point(file_path, list(CorrespondentAmazon.CFP.points.keys()))
 #all_distances_boxplot()
-accuracy_face_per_resolution()
+#accuracy_face_per_resolution()
 #teste()
 #teste_2()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")

@@ -10,20 +10,30 @@ import numpy as np
 rekognition = boto3.client("rekognition", region_name="us-east-1")
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
 
+vertical_point_a = 11
+vertical_point_b = 8
+horizontal_point_a = 0
+horizontal_point_b = 18
+
 def get_euclidean_results(ground_truth_pts, library_pts, correspondet_points, image, vertical_distance=1, horizontal_distance=1):
     all_distances = []
+
+    vertical_distance = calc_euclidean_distance(ground_truth_pts[vertical_point_a][0], ground_truth_pts[vertical_point_a][1],
+                                              ground_truth_pts[vertical_point_b][0], ground_truth_pts[vertical_point_b][1])
+    horizontal_distance = calc_euclidean_distance(ground_truth_pts[horizontal_point_a][0], ground_truth_pts[horizontal_point_a][1],
+                                              ground_truth_pts[horizontal_point_b][0], ground_truth_pts[horizontal_point_b][1])
 
     height, width = image.shape[:2]
     resolution = height * width
 
-    for i, groud_truth_point in enumerate(ground_truth_pts, start=1):
+    for i, ground_truth_point in enumerate(ground_truth_pts, start=1):
         if correspondet_points.get(i) is not None:
             try:
                 fa_point = library_pts[correspondet_points.get(i)]
-                distance = calc_euclidean_distance(groud_truth_point[0], groud_truth_point[1],
+                distance = calc_euclidean_distance(ground_truth_point[0], ground_truth_point[1],
                         fa_point[0], fa_point[0], vertical_distance, horizontal_distance)    
                 # Dividindo pela área da imagem para normalizar e multiplicando por 1000 para evitar números muito pequenos
-                all_distances.append(distance * 1000 / resolution)
+                all_distances.append(distance)
             except IndexError as e:
                 print(f"Erro: {e}")
                 print(f"Valor do i: {i} ### valor do correspondente: {correspondet_points.get(i)}")
@@ -37,6 +47,8 @@ def calc_euclidean_distance(x1, y1, x2, y2, vertical_distance=1, horizontal_dist
     return round(math.sqrt( ( (x2 - x1) / horizontal_distance ) **2 + ( (y2 - y1) / vertical_distance ) **2), 2)
 
 def writes_euclidean_distances(image_path, face_detected, all_distances, file_path):
+    if not all_distances:
+        all_distances = [[]]
     
     with open(file_path, 'a') as file:
         image = Image.open(image_path)
@@ -66,7 +78,7 @@ def get_face_alignment_points(image):
             return [], FaceType.NONE 
         elif len(fa_points_list) > 1:
             return fa_points_list, FaceType.MULTIPLE
-        return fa_points_list[0], FaceType.ONE
+        return fa_points_list, FaceType.ONE
         
     except Exception as e:
         print("Erro:", e)

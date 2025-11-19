@@ -25,19 +25,20 @@ def run():
         save_path = f"output/face_alignment/{img_suffix}"
         
         distances_list = []
+        correspondent_points = CorrespondentFaceAlignment.CFP.points
         
-        if face_detected == FaceType.ONE:
-            save_images.fiducial_points(image, ground_truth_points_list, fa_points_list, CorrespondentFaceAlignment.CFP.points, save_path)
-            distances_list.append(core.get_euclidean_results(ground_truth_points_list, fa_points_list, CorrespondentFaceAlignment.CFP.points, image))
-        elif face_detected == FaceType.MULTIPLE:
+        if face_detected == FaceType.MULTIPLE:
             save_images.bounding_boxes(image, fa_points_list, save_path)
-            for face_points in fa_points_list:
-                if teste(image, face_points):
-                    distances_list.append(core.get_euclidean_results(ground_truth_points_list, face_points, CorrespondentFaceAlignment.CFP.points, image))
-        else:
-            distances_list = [[]]
+        
+        for fa_points in fa_points_list:
+            if face_detected == FaceType.ONE:
+                save_images.fiducial_points(image, ground_truth_points_list, fa_points, correspondent_points, save_path)
+            elif face_detected == FaceType.MULTIPLE:
+                if not core.valids_bounding_box(image, fa_points):
+                    continue
+            distances_list.append(core.get_euclidean_results(ground_truth_points_list, fa_points, correspondent_points, image))
 
-        core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "output/cfp_fa_result.txt")
+        core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "result/cfp_fa_result.txt")
 
 def teste(image, library_points_list):
     image_height, image_width = image.shape[:2]
@@ -52,8 +53,8 @@ def teste(image, library_points_list):
 
     return width * height > 0.2 * ( image_height * image_width )
 
-if os.path.exists('output/cfp_fa_result.txt'):
-    os.remove('output/cfp_fa_result.txt')  
+if os.path.exists('result/cfp_fa_result.txt'):
+    os.remove('result/cfp_fa_result.txt')  
 
 #if os.path.exists('output/distances.txt'):
  #   os.remove('output/distances.txt')  
