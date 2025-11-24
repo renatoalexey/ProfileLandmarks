@@ -10,7 +10,8 @@ output_amazon_path = "result/cfp_amazon_result.txt"
 
 def run():
     image_path_list = cfp.get_images_paths()
-    #image_path_list = ['/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/430/profile/03.jpg']
+    #image_path_list = ['/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/018/profile/01.jpg']
+    #image_path_list = ['F:\\Bases\\cfp-dataset\\Data\\Images\\018\\profile\\01.jpg']
     for image_path in image_path_list:
         
         ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)

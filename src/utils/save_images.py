@@ -16,15 +16,15 @@ def fiducial_points(image, ground_truth_points, library_points, correspondent_po
             library_point = library_points[correspondent_points.get(i)]
             x, y = ground_truth_point
             plt.scatter(x, y, color="red", s=10)
-            plt.annotate(str(i + 1), (x, y), textcoords="offset points", xytext=(0,5), ha='center', color="red", fontsize=8)
+            plt.annotate(str(i+1) , (x, y), textcoords="offset points", xytext=(0,5), ha='center', color="red", fontsize=8)
             
             a, b = library_point
             plt.scatter(a, b, color="blue", s=10)
             plt.annotate(str(correspondent_points.get(i) + 1), (a, b), textcoords="offset points", xytext=(0,5), ha='center', color="blue", fontsize=8)
         
         #plt.imshow(img)
-        plt.axis("off")
-        plt.savefig(save_path)
+    plt.axis("off")
+    plt.savefig(save_path)
         
 def bounding_boxes(image, library_points_list, output_path=None):
     plt.clf()

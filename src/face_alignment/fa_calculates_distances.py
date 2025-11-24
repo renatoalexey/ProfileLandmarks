@@ -40,19 +40,6 @@ def run():
 
         core.writes_euclidean_distances(image_path, face_detected.value, distances_list, "result/cfp_fa_result.txt")
 
-def teste(image, library_points_list):
-    image_height, image_width = image.shape[:2]
-    
-    x_min = np.min(library_points_list[:, 0])
-    y_min = np.min(library_points_list[:, 1])
-    x_max = np.max(library_points_list[:, 0])
-    y_max = np.max(library_points_list[:, 1])
-
-    width = x_max - x_min
-    height = y_max - y_min
-
-    return width * height > 0.2 * ( image_height * image_width )
-
 if os.path.exists('result/cfp_fa_result.txt'):
     os.remove('result/cfp_fa_result.txt')  
 

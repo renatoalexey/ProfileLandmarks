@@ -1,8 +1,7 @@
 from flask import Flask, jsonify, request, send_file
 import os
-import json
 import ast
-import sys
+from src import plot_image_points
 from src.utils import cfp
 from src.utils import core
 from src.utils import save_images 
@@ -34,6 +33,7 @@ def soma():
     a = int(request.args.get("a", 0))
     b = int(request.args.get("b", 0))
     return jsonify({"resultado": a + b})
+
 
 @app.route("/image", methods=["GET"])
 def get_ground_truth_points():
@@ -80,6 +80,7 @@ def get_compare_results():
     face_detected = FaceType.ONE
     if  size == 1:
         print("Uma face")
+        save_images.fiducial_points(image, ground_truth_points_list, library_pts[0], correspondet_points, save_path)
         distances_list.append(core.get_euclidean_results(ground_truth_points_list, library_pts[0], correspondet_points, image))
     elif size > 1:
         print("Múltiplas face") # o mlkit repete os rostos!

@@ -26,7 +26,7 @@ def get_euclidean_results(ground_truth_pts, library_pts, correspondet_points, im
     height, width = image.shape[:2]
     resolution = height * width
 
-    for i, ground_truth_point in enumerate(ground_truth_pts, start=1):
+    for i, ground_truth_point in enumerate(ground_truth_pts, start=0):
         if correspondet_points.get(i) is not None:
             try:
                 fa_point = library_pts[correspondet_points.get(i)]
@@ -85,8 +85,9 @@ def get_face_alignment_points(image):
         return fa_points_list, FaceType.NONE
 
 def get_amazon_points(img, image_path):
-    with open(image_path, "rb") as img_file:
-        img_bytes = img_file.read()
+    #with open(image_path, "rb") as img_file:
+    success, encoded_image = cv2.imencode(".png", img)
+    img_bytes = encoded_image.tobytes()
 
     # --- Chama o Rekognition ---
     response = rekognition.detect_faces(
@@ -100,7 +101,7 @@ def get_amazon_points(img, image_path):
     
     if len(faceDetails) == 0:
         faces_detected = FaceType.NONE
-        return [[]], faces_detected
+        return [], faces_detected
     elif len(faceDetails) > 1:
         faces_detected = FaceType.MULTIPLE
 
