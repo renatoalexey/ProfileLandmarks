@@ -12,7 +12,7 @@ def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
     plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
-    plt.ylabel('Média das distâncias por imagem')
+    plt.ylabel('Distances means')
     plt.savefig(f'{graph_name}.png')
 
 def get_image_name(line):
@@ -99,7 +99,8 @@ def distances_per_point(file_path, keys):
             point_distances_list[i].append(distance)
 
     label = get_library_from_path(file_path)
-    print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
+    keys = [ v + 1 for v in keys ]
+    print_graph(point_distances_list, f"points_distances_{label}", keys, "Labeled landmarks")
 
 def distances_per_resolution_area(file_path):
     resolution_distances = {}
@@ -135,7 +136,7 @@ def distances_per_resolution_area(file_path):
     #print(list(values))
     #print(labels)
     label = get_library_from_path(file_path)
-    print_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
+    print_graph(values, f"resolutions_distances_{label}", labels, "Total pixels")
 
 def get_rel_interval(file_path):
     resolution_area_list = []
@@ -197,8 +198,8 @@ def accuracy_face_per_resolution():
     #plt.xticks(range(len(blabla)), blabla)
     print(labels)
     plt.xticks(labels)
-    plt.xlabel("Área da imagem")
-    plt.ylabel("Percentual de faces detectadas")
+    plt.xlabel("Total pixels")
+    plt.ylabel("Detection Percentage(%)")
     plt.legend()
     # Mostra o gráfico
     #plt.show()
