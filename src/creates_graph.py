@@ -12,7 +12,7 @@ def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
     plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
-    plt.ylabel('Média das distâncias normalizadas entre os pontos (groud truth e biblioteca)')
+    plt.ylabel('Média das distâncias por imagem')
     plt.savefig(f'{graph_name}.png')
 
 def get_image_name(line):
@@ -154,78 +154,6 @@ def get_rel_interval(file_path):
     return sorted(resolution_area_list)
     #print(len(resolution_area_list))
 
-def teste():
-    file_path = "result/cfp_amazon_result.txt"
-    lines = get_file_lines(file_path)
-    amazon_names = []
-    for line in lines:
-        actual_img = get_image_name(line)
-        resolution_area = get_resolution_area(line)
-        amazon_names.append((actual_img, resolution_area))
-
-    file_path = "result/cfp_mlkit_result.txt"
-    lines = get_file_lines(file_path)
-    fa_names = []
-    for line in lines:
-        actual_img = get_image_name(line)
-        fa_names.append(actual_img)
-
-    for az in amazon_names:
-        if az[0] not in fa_names:
-            print(f"name: {az[0]}, {az[1]}, color: RGB, face detected: Multiple, distances: [], mean: 0")
-    
-def teste_2(): 
-    all_files = ["result/cfp_mlkit_result.txt"]
-    rels_interval_list = get_rel_interval(all_files[0])
-    x_keys = []
-    for file_path in all_files:
-        detected_area_list = []
-        lines = get_file_lines(file_path)
-
-        resolution_distance_list = {}
-        teste = {}
-        before_img = ''
-        for line in lines:
-            actual_img = get_image_name(line)
-            if line == '' or before_img == actual_img:
-                continue
-            before_img = actual_img
-            #monta estrutura de distancia por resolucao
-            resolution_area = get_resolution_area(line)
-            face_detected = get_face_detected(line)
-
-            detected_area_list.append((face_detected, resolution_area))
-            
-        sorted_distances_area_list = sorted(detected_area_list, key=lambda x: x[1])
-        detected_temp = []
-        values = []
-        labels = []
-        for i, sorted_dist in enumerate(sorted_distances_area_list, start=1):
-            detected_temp.append(sorted_dist[0])
-            if i % 200 == 0 :
-                labels.append(str(sorted_dist[1]))
-                values.append((detected_temp.count('True') + detected_temp.count('Multiple'))*100/len(detected_temp))
-                detected_temp = []
-            #if i == len(sorted_distances_area_list):
-             #   labels.append(f"> {labels[len(labels) - 1]}")
-            
-        img_name = get_image_name(line)
-        #plt.plot(list(map(lambda x: str(int(x/10000)), x_keys)), arrei, label=file_path, marker='o')
-        label = get_library_from_path(file_path)
-        plt.plot(labels, values, label=label, marker='o')
-    
-    #plt.xticks(range(len(blabla)), blabla)
-    print(labels)
-    plt.xticks(labels)
-    #plt.xticks(blabla)
-    plt.xlabel("Eixo X")
-    plt.ylabel("Percentual de acerto")
-    plt.legend()
-    #plt.grid(True)
-    # Mostra o gráfico
-    plt.show()
-    #plt.savefig('accuracy_face_3.png')
-    
 def accuracy_face_per_resolution():
 
     all_files = get_result_files()
@@ -269,7 +197,7 @@ def accuracy_face_per_resolution():
     #plt.xticks(range(len(blabla)), blabla)
     print(labels)
     plt.xticks(labels)
-    plt.xlabel("Quantidade de pixels")
+    plt.xlabel("Área da imagem")
     plt.ylabel("Percentual de faces detectadas")
     plt.legend()
     # Mostra o gráfico
@@ -281,45 +209,44 @@ def get_library_from_path(file_path):
     label = file_library_name[file_name]
     return label
 
-def run():
-    resolution_distances = {}
-    cfp_resolutions_path = "output/cfp_fa_result.txt" 
-    distance_means = []
-    with open(cfp_resolutions_path, 'r') as file:
-        lines = file.readlines()
+def tests_point_fa():
+    file_path = "result/cfp_amazon_result.txt"
+    lines = get_file_lines(file_path)
+    points_test_list = [0, 1]
+    distances_point_list = []
+    
+    for i, point_test in enumerate(points_test_list):
+        dist_temp = {}
         for line in lines:
             if line == '':
                 continue
+            img_name = get_image_name(line)
             distances = get_distances(line)
             if not distances:
                 continue
-            dist_mean = np.mean(distances)
-            distance_means.append(dist_mean)
-            
-            #monta estrutura de distancia por resolucao
-            resolution_area = get_resolution_area(line)
-            area_key = int( resolution_area/10000 + 1) * 10000
-            
-            if area_key in resolution_distances:
-                resolution_distances[area_key].append(dist_mean)
-            else:
-                resolution_distances[area_key] = [dist_mean]
-        
-        print_graph(distance_means, "distances")
-        print_graph(list(resolution_distances.values()), "resolutions_distances", list(resolution_distances.keys()))
 
+            dist_temp[img_name] = distances[point_test]
+        maior_par = max(dist_temp.items(), key=lambda x: x[1])
+        top5 = sorted(dist_temp.items(), key=lambda x: x[1], reverse=True)[:20]
+        #print(maior_par)
+        print(top5)
+    #    distances_point_list.append(dist_temp)
+
+    
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
 result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
+#result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
 
 # for result_path in result_paths_correspondent:
-#     #print('teste')
-#     distances_per_resolution_area(result_path[0])
-#     distances_per_point(result_path[0], list(result_path[1]))
+#       print('teste')
+#       distances_per_resolution_area(result_path[0])
+#       distances_per_point(result_path[0], list(result_path[1]))
 
 #file_path = "result/cfp_amazon_result.txt"
 
-all_distances_boxplot()
+tests_point_fa()
+#all_distances_boxplot()
 #accuracy_face_per_resolution()
 #teste()
 #teste_2()

@@ -31,7 +31,7 @@ def get_euclidean_results(ground_truth_pts, library_pts, correspondet_points, im
             try:
                 fa_point = library_pts[correspondet_points.get(i)]
                 distance = calc_euclidean_distance(ground_truth_point[0], ground_truth_point[1],
-                        fa_point[0], fa_point[0], vertical_distance, horizontal_distance)    
+                        fa_point[0], fa_point[1], vertical_distance, horizontal_distance)    
                 # Dividindo pela área da imagem para normalizar e multiplicando por 1000 para evitar números muito pequenos
                 all_distances.append(distance)
             except IndexError as e:
