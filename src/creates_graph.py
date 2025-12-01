@@ -92,7 +92,8 @@ def distances_per_point(file_path, keys):
         distances = get_distances(line)
         if not distances:
             continue
-        
+        # if  distances[11] > 0.15:
+        #     continue
         for i, distance in enumerate(distances):
             if len(point_distances_list) == i:
                 point_distances_list.append([])
@@ -211,9 +212,9 @@ def get_library_from_path(file_path):
     return label
 
 def tests_point_fa():
-    file_path = "result/cfp_amazon_result.txt"
+    file_path = "result/cfp_mlkit_result.txt"
     lines = get_file_lines(file_path)
-    points_test_list = [0, 1]
+    points_test_list = [12, 16, 17]
     distances_point_list = []
     
     for i, point_test in enumerate(points_test_list):
@@ -228,26 +229,25 @@ def tests_point_fa():
 
             dist_temp[img_name] = distances[point_test]
         maior_par = max(dist_temp.items(), key=lambda x: x[1])
-        top5 = sorted(dist_temp.items(), key=lambda x: x[1], reverse=True)[:20]
+        top5 = sorted(dist_temp.items(), key=lambda x: x[1], reverse=True)[:10]
         #print(maior_par)
         print(top5)
-    #    distances_point_list.append(dist_temp)
+        #distances_point_list.append(dist_temp)
 
     
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
 result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
-#result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
+#result_paths_correspondent = [("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys())]
 
 # for result_path in result_paths_correspondent:
-#       print('teste')
 #       distances_per_resolution_area(result_path[0])
 #       distances_per_point(result_path[0], list(result_path[1]))
 
 #file_path = "result/cfp_amazon_result.txt"
 
-tests_point_fa()
-#all_distances_boxplot()
+#tests_point_fa()
+all_distances_boxplot()
 #accuracy_face_per_resolution()
 #teste()
 #teste_2()
