@@ -12,7 +12,7 @@ def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
     plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
-    plt.ylabel('Média das distâncias por imagem')
+    plt.ylabel('Distances means')
     plt.savefig(f'{graph_name}.png')
 
 def get_image_name(line):
@@ -92,14 +92,16 @@ def distances_per_point(file_path, keys):
         distances = get_distances(line)
         if not distances:
             continue
-        
+        # if  distances[11] > 0.15:
+        #     continue
         for i, distance in enumerate(distances):
             if len(point_distances_list) == i:
                 point_distances_list.append([])
             point_distances_list[i].append(distance)
 
     label = get_library_from_path(file_path)
-    print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
+    keys = [ v + 1 for v in keys ]
+    print_graph(point_distances_list, f"points_distances_{label}", keys, "Labeled landmarks")
 
 def distances_per_resolution_area(file_path):
     lines = get_file_lines(file_path)
@@ -206,8 +208,8 @@ def accuracy_face_per_resolution():
     #plt.xticks(range(len(blabla)), blabla)
     print(labels)
     plt.xticks(labels)
-    plt.xlabel("Área da imagem")
-    plt.ylabel("Percentual de faces detectadas")
+    plt.xlabel("Total pixels")
+    plt.ylabel("Detection Percentage(%)")
     plt.legend()
     # Mostra o gráfico
     #plt.show()
@@ -219,9 +221,9 @@ def get_library_from_path(file_path):
     return label
 
 def tests_point_fa():
-    file_path = "result/cfp_amazon_result.txt"
+    file_path = "result/cfp_mlkit_result.txt"
     lines = get_file_lines(file_path)
-    points_test_list = [0, 1]
+    points_test_list = [12, 16, 17]
     distances_point_list = []
     
     for i, point_test in enumerate(points_test_list):
@@ -236,10 +238,10 @@ def tests_point_fa():
 
             dist_temp[img_name] = distances[point_test]
         maior_par = max(dist_temp.items(), key=lambda x: x[1])
-        top5 = sorted(dist_temp.items(), key=lambda x: x[1], reverse=True)[:20]
+        top5 = sorted(dist_temp.items(), key=lambda x: x[1], reverse=True)[:10]
         #print(maior_par)
         print(top5)
-    #    distances_point_list.append(dist_temp)
+        #distances_point_list.append(dist_temp)
 
     
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")

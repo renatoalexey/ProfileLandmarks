@@ -12,8 +12,8 @@ from .face_alignment.correspondent_fa_type import CorrespondentFaceAlignment
 from .mlkit.correspondent_mlkit_type import CorrespondentMLKit
 from PIL import Image
 
-#ground_truth_file_path = '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Fiducials/430/profile/03.txt'
-ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\487\\profile\\02.txt'
+ground_truth_file_path = '/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Fiducials/033/profile/04.txt'
+#ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\487\\profile\\02.txt'
 img_path = core.get_image_path(ground_truth_file_path)
 
 
@@ -22,11 +22,11 @@ img_path = core.get_image_path(ground_truth_file_path)
 def tests_face_alignment():
     ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
             
-    #fa_points_list, face_detected = core.get_face_alignment_points(image)
-    fa_points_list =[[124.  , 47.],[126.  , 65.],    [128.  , 83.],    [130.  , 97.],    [136. , 115.],    [152. , 129.],    [168. , 139.],    [186. , 147.],    [196. , 153.],    [202. , 149.],    [208. , 143.],    [208. , 135.],    [210. , 119.],    [212.  , 97.],[204.  , 89.],[202.  , 73.],[198.  , 53.],[178.  , 29.],[186.  , 22.],[194.  , 20.],[198.  , 22.],[200.  , 24.],[202.  , 26.],[200.  , 24.],[198.  , 26.],[194.  , 29.],[184.  , 39.],[202.  , 47.],[208.  , 57.],[216.  , 65.],[218.  , 73.],[202.  , 83.],[206.  , 83.],[208.  , 85.],[208.  , 85.],[204.  , 85.],[186.  , 41.],[192.  , 39.],[194.  , 39.],[192.  , 45.],[192.  , 45.],[190.  , 45.],[192.  , 49.],[196.  , 45.],[198.  , 45.],[190.  , 49.],[196.  , 51.],[196.  , 51.],[200. , 109.],[206. , 101.],[210.  , 95.],[212.  , 97.],[212.  , 95.],[210. , 101.],[204. , 109.],[210. , 113.],[212. , 115.],[212. , 115.],[210. , 115.],[208. , 113.],[200. , 109.],[208. , 103.],[210. , 103.],[210. , 103.],[204. , 109.],[210. , 107.],[210. , 107.],[208. , 107.]] 
+    fa_points_list, face_detected = core.get_face_alignment_points(image)
+    #fa_points_list =[[124.  , 47.],[126.  , 65.],    [128.  , 83.],    [130.  , 97.],    [136. , 115.],    [152. , 129.],    [168. , 139.],    [186. , 147.],    [196. , 153.],    [202. , 149.],    [208. , 143.],    [208. , 135.],    [210. , 119.],    [212.  , 97.],[204.  , 89.],[202.  , 73.],[198.  , 53.],[178.  , 29.],[186.  , 22.],[194.  , 20.],[198.  , 22.],[200.  , 24.],[202.  , 26.],[200.  , 24.],[198.  , 26.],[194.  , 29.],[184.  , 39.],[202.  , 47.],[208.  , 57.],[216.  , 65.],[218.  , 73.],[202.  , 83.],[206.  , 83.],[208.  , 85.],[208.  , 85.],[204.  , 85.],[186.  , 41.],[192.  , 39.],[194.  , 39.],[192.  , 45.],[192.  , 45.],[190.  , 45.],[192.  , 49.],[196.  , 45.],[198.  , 45.],[190.  , 49.],[196.  , 51.],[196.  , 51.],[200. , 109.],[206. , 101.],[210.  , 95.],[212.  , 97.],[212.  , 95.],[210. , 101.],[204. , 109.],[210. , 113.],[212. , 115.],[212. , 115.],[210. , 115.],[208. , 113.],[200. , 109.],[208. , 103.],[210. , 103.],[210. , 103.],[204. , 109.],[210. , 107.],[210. , 107.],[208. , 107.]] 
     correspondent_points = CorrespondentFaceAlignment.CFP.points
     # if face_detected == FaceType.ONE:
-    distances_list = core.get_euclidean_results(ground_truth_points_list, fa_points_list, correspondent_points, image)
+    #distances_list = core.get_euclidean_results(ground_truth_points_list, fa_points_list, correspondent_points, image)
     # elif face_detected == FaceType.MULTIPLE:
     #     print('adsf')
   
@@ -37,11 +37,11 @@ def tests_face_alignment():
     all_points(image, ground_truth_points_list, fa_points_list[0])
 def tests_amazon():
     ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
-    #amazon_points, face_detected = core.get_amazon_points(image, img_path)
+    amazon_points, face_detected = core.get_amazon_points(image, img_path)
     correspondent_points = CorrespondentAmazon.CFP.points
     #print(amazon_points)
-    #amazon_points = np.array(amazon_points[0])
-    amazon_points = []
+    amazon_points = np.array(amazon_points[0])
+    #amazon_points = []
     #if amazon_points:
     all_points(image, ground_truth_points_list, amazon_points)
 
@@ -68,22 +68,26 @@ def prints_graphic(img, library_points_list, correspondent_points, ground_truth_
             plt.show()
 
 def all_points(image, ground_truth_points, library_points):
-    correspondent_points = CorrespondentFaceAlignment.CFP.points
+    correspondent_points = CorrespondentAmazon.CFP.points
     keys = list(correspondent_points.keys())
     values = list(correspondent_points.values())
     plt.imshow(image)
     for i, ground_truth_point in enumerate(ground_truth_points, start=0):
         if i not in keys:
             continue
+        if i != 11 and i != 14 and i != 17 and i != 25:
+            continue
         x, y = ground_truth_point
         plt.scatter(x, y, color="red", s=10)
-        plt.annotate(str(i + 1), (x, y), textcoords="offset points", xytext=(0,5), ha='center', color="red", fontsize=8)
+        plt.annotate(str(i + 1), (x, y), textcoords="offset points", xytext=(0,5), ha='center', color="red", fontsize=12)
     for i, library_point in enumerate(library_points, start=0):     
         if i not in values:
             continue
+        if i != 10 and i != 9 and i != 18 and i != 3:
+            continue
         a, b = library_point
         plt.scatter(a, b, color="blue", s=10)
-        plt.annotate(str(i + 1), (a, b), textcoords="offset points", xytext=(0,5), ha='center', color="blue", fontsize=8)
+        plt.annotate(str(i + 1), (a, b), textcoords="offset points", xytext=(0,5), ha='center', color="blue", fontsize=12)
         
         #plt.imshow(img)
     plt.axis("off")
@@ -103,5 +107,5 @@ def print_points(fiducial_points, plt, color='red'):
 
 
 #tests_face_alignment()
-#tests_amazon()
+tests_amazon()
 
