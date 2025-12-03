@@ -102,11 +102,10 @@ def distances_per_point(file_path, keys):
     print_graph(point_distances_list, f"points_distances_{label}", keys, "Points")
 
 def distances_per_resolution_area(file_path):
-    resolution_distances = {}
     lines = get_file_lines(file_path)
 
-    resolution_area_list = []
     distances_area_list = []
+    img_names_list = []
     for line in lines:
         if line == '':
             continue
@@ -115,26 +114,36 @@ def distances_per_resolution_area(file_path):
             continue
 
         dist_mean = np.mean(distances)
-    
         #monta estrutura de distancia por resolucao
-        resolution_area = get_resolution_area(line)
-        
+        resolution_area = get_resolution_area(line)        
         distances_area_list.append((dist_mean, resolution_area))
+        
+        img_names_list.append((dist_mean, resolution_area, get_image_name(line), get_face_detected(line)))
 
     sorted_distances_area_list = sorted(distances_area_list, key=lambda x: x[1])
+    img_names_list = sorted(img_names_list, key=lambda x: x[1])
     distances_temp = []
     values = []
     labels = []
+    names = []
+    names_temp = []
     for i, sorted_dist in enumerate(sorted_distances_area_list, start=1):
         distances_temp.append(sorted_dist[0])
-        if i % 200 == 0:
+        #names_temp.append((img_names_list[i-1][2], sorted_dist[0]))
+        names_temp.append(img_names_list[i-1])
+        if i % 200 == 0: #or i == len(sorted_distances_area_list):
             labels.append(sorted_dist[1])
             values.append(distances_temp)
+            names.append(names_temp)
             distances_temp = []
+            names_temp = []
         
-    #print(list(values))
-    #print(labels)
     label = get_library_from_path(file_path)
+    
+    for teste in names:
+        ocorrencias = [t[3] for t in teste].count("Multiple")
+        print(ocorrencias)
+    
     print_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
 
 def get_rel_interval(file_path):
@@ -235,17 +244,16 @@ def tests_point_fa():
     
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
-result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
-#result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
+#result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
+result_paths_correspondent = [("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys())]
 
-# for result_path in result_paths_correspondent:
-#       print('teste')
-#       distances_per_resolution_area(result_path[0])
-#       distances_per_point(result_path[0], list(result_path[1]))
+for result_path in result_paths_correspondent:
+    distances_per_resolution_area(result_path[0])
+    #distances_per_point(result_path[0], list(result_path[1]))
 
 #file_path = "result/cfp_amazon_result.txt"
 
-tests_point_fa()
+#tests_point_fa()
 #all_distances_boxplot()
 #accuracy_face_per_resolution()
 #teste()
