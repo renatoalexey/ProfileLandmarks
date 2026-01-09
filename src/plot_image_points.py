@@ -107,5 +107,5 @@ def print_points(fiducial_points, plt, color='red'):
 
 
 #tests_face_alignment()
-tests_amazon()
+#tests_amazon()
 

@@ -24,5 +24,5 @@ def run():
     print(f"Resolution min: {min(resolution_area_list)}")
     print(f"Resolution max: {max(resolution_area_list)}")
 
-run()
+#run()
     

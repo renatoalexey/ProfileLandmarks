@@ -64,19 +64,40 @@ def writes_euclidean_distances(image_path, face_detected, all_distances, file_pa
             )
             file.write(msg)
 
+def writes_landmarks_bb(library_name, image_name, landmarks, bounding_box, l_accuracy):
+    with open(f"result/{library_name}/landmarks.txt", 'a') as file:
+            landmarks_fmt = []
+            for x in landmarks:
+                landmarks_fmt.append(int(x[0]))
+                landmarks_fmt.append(int(x[1]))
+                
+            # msg = (
+            #     f"name: {image_name}, landmarks: {landmarks_fmt}, bounding_box: {bounding_box}, l_accuracy: {l_accuracy}\n"
+            # )
+
+            msg = (
+                f"name: {image_name}, l_accuracy: {l_accuracy}\n"
+            )
+                        
+            file.write(msg)
+            #file.write(f"name: {image_name}, landmarks: {landmarks_bb_list[0]}, bb: {landmarks_bb_list[1]}")
+
 def get_image_path(fiducials_file_path):
     return fiducials_file_path.replace("Fiducials", "Images").replace("txt", "jpg")
     #images_index = image_path.index("Images")
     
+def get_file_lines(file_path):
+    with open(file_path, 'r') as file:
+        return file.readlines()
 
 def get_face_alignment_points(image):
     fa_points_list = []
     try:
-        fa_points_list = fa.get_landmarks(image)
-        
-        if fa_points_list is None:
+        fa_points_list = fa.get_landmarks_from_image(image, return_bboxes=True, return_landmark_score=True)
+        #print(fa_points_list) 
+        if fa_points_list[0] is None:
             return [], FaceType.NONE 
-        elif len(fa_points_list) > 1:
+        elif len(fa_points_list[0]) > 1:
             return fa_points_list, FaceType.MULTIPLE
         return fa_points_list, FaceType.ONE
         
@@ -101,13 +122,16 @@ def get_amazon_points(img, image_path):
     
     if len(faceDetails) == 0:
         faces_detected = FaceType.NONE
-        return [], faces_detected
+        return [], [], faces_detected
     elif len(faceDetails) > 1:
         faces_detected = FaceType.MULTIPLE
 
     h, w, _ = img.shape
-
+    bbs = []
     for i, face in enumerate(faceDetails):
+        bounding_box = face["BoundingBox"]
+        bb_fmt = {"Width": float(bounding_box["Width"] * w), "Height": float(bounding_box["Height"] * h), "Left": float(bounding_box["Left"] * w), "Top": float(bounding_box["Top"] * h)}
+        bbs.append(bb_fmt)
         points_temp = []
         for landmark in face["Landmarks"]:
             x = float(landmark["X"] * w)
@@ -115,7 +139,7 @@ def get_amazon_points(img, image_path):
             points_temp.append((x, y))
         amazon_pts.append(points_temp)
 
-    return amazon_pts, faces_detected
+    return amazon_pts, bbs, faces_detected
 
 def save_results_library(ground_truth_points_list, libray_points_list, correspondent_points_list,
                          face_detected, image, image_path):
@@ -135,3 +159,29 @@ def valids_bounding_box(image, library_points_list):
     height = y_max - y_min
 
     return width * height > 0.2 * ( image_height * image_width )
+
+def gets_biggest_bounding_box(bbs):
+    biggest_bb = -1
+    iMax = -1
+    
+    for i, bb in enumerate(bbs):
+        width = bb[0] - bb[2]
+        height = bb[1] - bb[3]
+    
+        area_temp = width * height
+        if area_temp > biggest_bb:
+            biggest_bb = area_temp
+            iMax = i
+        
+    #print(biggest_bb, iMax)
+    return iMax
+
+def calcs_landmarks_inside(ground_truth_pts, bounding_box):
+    landmarks_inside = 0
+    for i, ground_truth_point in enumerate(ground_truth_pts, start=0):
+        x = ground_truth_point[0]
+        y = ground_truth_point[1]
+        if x >= bounding_box[0] and x <= bounding_box[2] and y >= bounding_box[1] and y <= bounding_box[3]:
+            landmarks_inside += 1
+
+    return landmarks_inside*100/30

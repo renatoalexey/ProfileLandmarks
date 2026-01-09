@@ -58,6 +58,35 @@ def bounding_boxes(image, library_points_list, output_path=None):
     #plt.show()
     plt.close()
 
+def library_bounding_boxes(image, bounding_box_points, output_path=None):
+    plt.clf()
+    fig, ax = plt.subplots()
+    ax.imshow(image)   
+    #plt.imshow(image)
+    x_min = bounding_box_points[0]
+    y_min = bounding_box_points[1]
+    x_max = bounding_box_points[2]
+    y_max = bounding_box_points[3]
+            
+    # Cria retângulo
+    width = x_max - x_min
+    height = y_max - y_min
+
+    rectangle = patches.Rectangle(
+        (x_min, y_min),
+        width,
+        height,
+        linewidth=2,
+        edgecolor='r',
+        facecolor='none'
+    )
+
+    ax.add_patch(rectangle)
+    
+    plt.axis("off")
+    plt.savefig(output_path)
+    #plt.show()
+    plt.close()
 #ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\446\\profile\\04.txt'
 #ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\085\\profile\\01.txt'
 #img_path = core.get_image_path(ground_truth_file_path)

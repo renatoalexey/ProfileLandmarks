@@ -56,6 +56,32 @@ def get_ground_truth_points():
 
     #return jsonify({"ground_truth_pt": ground_truth_pts})
 
+@app.route("/bounding/box", methods=["GET"])
+def calcs_bb_accuracy():
+    image_path = request.args.get("image_path")
+    library_pts = request.args.get("library_pts")
+    library_pts = ast.literal_eval(library_pts.strip("'"))
+    bounding_box_list = np.array(ast.literal_eval(request.args.get("bounding_box").strip("'")), dtype=int)
+    
+    #print(bounding_box_list)
+    
+    if not library_pts:
+        return
+
+    ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)
+
+    i_max = core.gets_biggest_bounding_box(bounding_box_list)
+    bounding_box_max = bounding_box_list[i_max]
+    l_accuracy = core.calcs_landmarks_inside(ground_truth_points_list, bounding_box_max)
+    l_accuracy = round(l_accuracy, 2)
+    print(l_accuracy) 
+    img_suffix = image_path[image_path.index("Images") + 7: len(image_path)].replace("/", "_")
+    core.writes_landmarks_bb("mlkit", img_suffix, library_pts[i_max], bounding_box_max, l_accuracy)
+    img_suffix = image_path[image_path.index("Images") + 7: len(image_path)].replace("/", "_")
+    save_path = f"output/mlkit/bounding_box/{img_suffix}"
+    save_images.library_bounding_boxes(image, bounding_box_max, save_path)
+    return jsonify({"teste": 123})
+    
 @app.route("/compare/points", methods=["GET"])
 def get_compare_results():
     image_path = request.args.get("image_path")
@@ -120,8 +146,8 @@ def get_gt_points(fiducials_file_path):
     return ground_truth_pts
 
 file_path = "result/cfp_mlkit_result.txt" 
-if os.path.exists(file_path):
-    os.remove(file_path)    
+#if os.path.exists(file_path):
+ #   os.remove(file_path)    
 if __name__ == "__main__":
     # 0.0.0.0 = acessível de outros dispositivos da rede
     app.run(host="0.0.0.0", port=5000, debug=True)
