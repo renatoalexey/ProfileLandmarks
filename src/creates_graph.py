@@ -77,8 +77,8 @@ def all_distances_boxplot():
                 soma_key = int( soma/100 + 1) * 100
             distances_tools_list.append(distance_means)
 
-    for teste in distances_tools_list:
-        print(np.mean(teste)) 
+    #for teste in distances_tools_list:
+        #print(np.mean(teste)) 
     print_graph(distances_tools_list, "distances", label_names, "Bibliotecas")
 
 def distances_per_point(file_path, keys):
@@ -144,7 +144,7 @@ def distances_per_resolution_area(file_path):
     
     for teste in names:
         ocorrencias = [t[3] for t in teste].count("Multiple")
-        print(ocorrencias)
+        #print(ocorrencias)
     
     print_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
 
@@ -169,14 +169,13 @@ def accuracy_face_per_resolution():
 
     all_files = get_result_files()
     #all_files = ["result/cfp_fa_result.txt"]
-    rels_interval_list = get_rel_interval(all_files[0])
-    x_keys = []
+    #rels_interval_list = get_rel_interval(all_files[0])
     for file_path in all_files:
+        if os.path.isdir(file_path):
+            continue
         detected_area_list = []
         lines = get_file_lines(file_path)
 
-        resolution_distance_list = {}
-        teste = {}
         before_img = ''
         for line in lines:
             actual_img = get_image_name(line)
@@ -200,7 +199,6 @@ def accuracy_face_per_resolution():
                 values.append((detected_temp.count('True') + detected_temp.count('Multiple'))*100/len(detected_temp))
                 detected_temp = []
             
-        img_name = get_image_name(line)
         #plt.plot(list(map(lambda x: str(int(x/10000)), x_keys)), arrei, label=file_path, marker='o')
         label = get_library_from_path(file_path)
         plt.plot(labels, values, label=label, marker='o')
@@ -246,18 +244,18 @@ def tests_point_fa():
     
 #get_resolution_sum("name: 001/profile\01.jpg, resolution: 158x157, color: RGB, face detected: True, distances: [12.85, 17.62, 27.88, 31.04, 28.19, 24.89, 20.72, 17.03, 7.39, 63.9, 81.49, 94.78, 57.51, 62.88, 56.66, 63.94, 74.62, 74.0, 71.01, 52.4, 47.84, 27.59, 38.01, 25.89], mean: 45.00541666666667")
 
-#result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
-result_paths_correspondent = [("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys())]
+result_paths_correspondent = [("result/cfp_amazon_result.txt", CorrespondentAmazon.CFP.points.keys()), ("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys()), ("result/cfp_mlkit_result.txt", CorrespondentMLKit.CFP.points.keys())]
+#result_paths_correspondent = [("result/cfp_fa_result.txt", CorrespondentFaceAlignment.CFP.points.keys())]
 
 for result_path in result_paths_correspondent:
     distances_per_resolution_area(result_path[0])
-    #distances_per_point(result_path[0], list(result_path[1]))
+    distances_per_point(result_path[0], list(result_path[1]))
 
 #file_path = "result/cfp_amazon_result.txt"
 
 #tests_point_fa()
-#all_distances_boxplot()
-#accuracy_face_per_resolution()
+all_distances_boxplot()
+accuracy_face_per_resolution()
 #teste()
 #teste_2()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")

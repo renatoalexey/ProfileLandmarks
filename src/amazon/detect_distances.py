@@ -11,7 +11,7 @@ output_amazon_path = "result/cfp_amazon_result.txt"
 def run():
     image_path_list = cfp.get_images_paths()
     #image_path_list = ['/home/renatoalexey/Documents/Bases/cfp-dataset/Data/Images/018/profile/01.jpg']
-    #image_path_list = ['F:\\Bases\\cfp-dataset\\Data\\Images\\001\\profile\\01.jpg']
+    image_path_list = ['F:\\Bases\\cfp-dataset\\Data\\Images\\033\\profile\\02.jpg']
     for image_path in image_path_list:
         
         ground_truth_points_list, image = cfp.get_ground_truth_points(image_path)
@@ -28,9 +28,9 @@ def run():
         l_accuracy = round(l_accuracy, 2)
         print(l_accuracy) 
         img_suffix = image_path[image_path.index("Images") + 7: len(image_path)].replace("/", "_")
-        core.writes_landmarks_bb("amazon", img_suffix, amazon_points_list[i_max], bounding_box_max, l_accuracy)
+        #core.writes_landmarks_bb("amazon", img_suffix, amazon_points_list[i_max], bounding_box_max, l_accuracy)
         
-        #saves_distances(image_path, ground_truth_points_list, image, amazon_points_list, face_detected, img_suffix)
+        saves_distances(image_path, ground_truth_points_list, image, amazon_points_list[i_max], face_detected, img_suffix)
 
 def get_bounding_box_coordenates(bb):
     x_min = bb['Left']
@@ -49,15 +49,15 @@ def saves_distances(image_path, ground_truth_points_list, image, amazon_points_l
     distances_list = []
     correspondent_points = CorrespondentAmazon.CFP.points
 
+    #if face_detected == FaceType.MULTIPLE:
+        #save_images.bounding_boxes(image, amazon_points_list, save_path)
+    #for amazon_points in amazon_points_list:
+        #if face_detected == FaceType.ONE:
+            #save_images.fiducial_points(image, ground_truth_points_list, amazon_points, correspondent_points, save_path)
     if face_detected == FaceType.MULTIPLE:
-        save_images.bounding_boxes(image, amazon_points_list, save_path)
-    for amazon_points in amazon_points_list:
-        if face_detected == FaceType.ONE:
-            save_images.fiducial_points(image, ground_truth_points_list, amazon_points, correspondent_points, save_path)
-        elif face_detected == FaceType.MULTIPLE:
-            if not core.valids_bounding_box(image, amazon_points):
-                continue
-        distances_list.append(core.get_euclidean_results(ground_truth_points_list, amazon_points, CorrespondentAmazon.CFP.points, image))
+        if not core.valids_bounding_box(image, amazon_points_list):
+            return
+    distances_list.append(core.get_euclidean_results(ground_truth_points_list, amazon_points_list, CorrespondentAmazon.CFP.points, image))
 
     core.writes_euclidean_distances(image_path, face_detected.value, distances_list, output_amazon_path)
 
