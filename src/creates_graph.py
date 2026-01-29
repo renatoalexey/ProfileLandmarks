@@ -8,12 +8,28 @@ from src.amazon.correspondent_amazon_type import CorrespondentAmazon
 
 file_library_name = {"cfp_fa_result.txt": "Face Alignment", "cfp_mlkit_result.txt": "ML Kit", "cfp_amazon_result.txt": "Amazon Rekognition"}
 
+def print_pile_graph(means, graph_name, positions=None, x_label=None):
+    plt.figure(figsize=(12, 5))
+    plt.boxplot(means, positions, tick_labels=positions, whis=2.5)
+    plt.xlabel(x_label, fontsize=15)
+    plt.ylabel('Distances means', fontsize=15)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    plt.savefig(
+        f'{graph_name}.png',
+        bbox_inches='tight')
+
 def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
-    plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
+    plt.boxplot(means, positions, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
     plt.ylabel('Distances means')
-    plt.savefig(f'{graph_name}.png')
+
+    plt.savefig(
+        f'{graph_name}.png',
+        #dpi=600,
+        bbox_inches='tight')
 
 def get_image_name(line):
     match = re.search(r"name:[^,]*", line)
@@ -101,7 +117,7 @@ def distances_per_point(file_path, keys):
 
     label = get_library_from_path(file_path)
     keys = [ v + 1 for v in keys ]
-    print_graph(point_distances_list, f"points_distances_{label}", keys, "Labeled landmarks")
+    print_pile_graph(point_distances_list, f"points_distances_{label}", keys, "Labeled landmarks")
 
 def distances_per_resolution_area(file_path):
     lines = get_file_lines(file_path)
@@ -146,7 +162,7 @@ def distances_per_resolution_area(file_path):
         ocorrencias = [t[3] for t in teste].count("Multiple")
         #print(ocorrencias)
     
-    print_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
+    print_pile_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
 
 def get_rel_interval(file_path):
     resolution_area_list = []

@@ -7,7 +7,7 @@ threshold_list = [70, 90, 100]
 
 def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
-    plt.boxplot(means, positions, showmeans=True, meanline=True, tick_labels=positions, whis=2.5)
+    plt.boxplot(means, positions, showmeans=True, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label)
     plt.ylabel('Accuracy(%)')
     plt.savefig(f'{graph_name}.png')
@@ -29,4 +29,15 @@ def run():
         all_bounding_boxes.append(bb_accuracy_list)
     print_graph(all_bounding_boxes, "accuracy_landmarks", tool_list, "Bibliotecas")
 
-run()
+def get_worst_bbs(tool_name):
+    file_path = f"result/{tool_name}/landmarks.txt"
+    bb_accuracy_list = []
+     
+    for i, line in enumerate(core.get_file_lines(file_path), start=1):
+        bb_accuracy_list.append((i, float(get_bb_accuracy(line))))
+
+    top = sorted(bb_accuracy_list, key=lambda x: x[1])[:10]
+    print(top)
+
+get_worst_bbs('face_alignment')
+#run()
