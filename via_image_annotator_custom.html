@@ -1072,10 +1072,6 @@ POSSIBILITY OF SUCH DAMAGE.
     <div id="via_start_info_content" class="hide">
       <ul>
         <li>To start annotation of an image, audio and video, select <span class="text_button" onclick="via.vm._on_add_media_local()">local files</span> or <span class="text_button" onclick="via.vm._on_add_media_remote()">add files</span> (local files using file:// and remote files using http:// URI). You can also add a list of file URI in <span class="text_button" onclick="via.vm._on_add_media_bulk()">bulk</span>.</li>
-        <li>Press <span class="key">Space</span> key to play or pause an audio or video at any time (more keyboard <span class="text_button" onclick="_via_util_page_show('page_keyboard_shortcut')">shortcuts</span>).</li>
-        <li>Spatial regions (e.g. 50x80 pixel rectangular bounding box) can be defined for image and video frame when video is paused. Temporal segments (e.g. video segment from time 3.1 sec. to 12.5 sec) can be defined for audio and video files.</li>
-        <li>Use the <span class="text_button" onclick="via.editor.show()">attribute editor</span> to define or update attributes (e.g. name, colour, etc.) of user defined regions.</li>
-        <li>You can also try preloaded demo for <a target="_blank" href="http://www.robots.ox.ac.uk/~vgg/software/via/demo/via_image_annotator.html">image</a>, <a target="_blank" href="http://www.robots.ox.ac.uk/~vgg/software/via/demo/via_audio_annotator.html">audio</a> and <a target="_blank" href="http://www.robots.ox.ac.uk/~vgg/software/via/demo/via_video_annotator.html">video</a> annotation.</li>
       </ul>
     </div>
 
@@ -3258,16 +3254,21 @@ _via_data.prototype.project_save = function() {
       // of inline files (i.e. this.store.file[fid].loc === _VIA_FILE_LOC.INLINE)
       var data_blob = new Blob( [JSON.stringify(this.store)],
                                 {type: 'text/json;charset=utf-8'});
-      /*var filename = [];
+      var filename = [];
       if ( this.store.project.pid === _VIA_PROJECT_ID_MARKER ) {
         filename.push('via_project_');
       } else {
         filename.push(this.store.project.pid.substr(0,8) + '_');
       }
       filename.push(_via_util_date_to_filename_str(Date.now()));
-      filename.push('.json');*/
-      jsonFileName += ".json";
-      _via_util_download_as_file(data_blob, jsonFileName);
+      filename.push('.json');
+      //jsonFileName += ".json";
+      _via_util_download_as_file(data_blob, filename.join(''));
+
+      const file = new File([data_blob], "arquivo.json", {  
+        type: 'text/json;charset=utf-8'
+      })
+
       ok_callback();
     }
     catch(err) {
@@ -4139,10 +4140,10 @@ _via_import_export.prototype.export_to_via3_csv = function() {
     var filename = [];
     filename.push(this.d.store.project.pname.replace(' ', '-'));
     filename.push(_via_util_date_to_filename_str(Date.now()));
-    jsonFileName = filename.join('');
+    //jsonFileName = filename.join('');
     filename.push('_export.csv');
     _via_util_download_as_file(data_blob, filename.join(''));
-    _via_data.prototype.project_save();
+    //_via_data.prototype.project_save();
   }.bind(this));
 }
 
