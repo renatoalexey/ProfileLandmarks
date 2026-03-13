@@ -570,6 +570,30 @@ to annotate temporal segments of a video: contains 4 rows
     margin: 1em 0;
 }
 
+
+#_via_message_container2 {
+    display: none;
+    width: 100vw;
+    position: fixed;
+    bottom: 50%;
+    z-index: 9999;
+    text-align: left;
+}
+
+#_via_message_container2 #_via_message2 {
+    position: relative;
+    display: inline;
+    margin: auto;
+    background-color: #000000;
+    color: #ffff00;
+    font-size: medium;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 2rem;
+    padding: 0.5rem 2rem;
+}
+
 /* Message Panel */
 
 #_via_message_container {
@@ -2030,7 +2054,7 @@ _via_control_panel.prototype._add_view_manager_tools = function() {
 
   var add_media_local = _via_util_get_svg_button('micon_add_circle', 'Add Audio or Video File in Local Computer', 'add_media_local');
   add_media_local.addEventListener('click', this.via.vm._on_add_media_local.bind(this.via.vm));
-  this.c.appendChild(add_media_local);
+  //this.c.appendChild(add_media_local);
 
   var add_media_bulk = _via_util_get_svg_button('micon_lib_add', 'Bulk add file URI ( e.g. file:///... or http://... ) contained in a local CSV file where each row is a remote or local filename.', 'add_media_bulk');
   //add_media_bulk.addEventListener('click', this.via.vm._on_add_media_bulk.bind(this.via.vm));
@@ -2040,11 +2064,11 @@ _via_control_panel.prototype._add_view_manager_tools = function() {
     }
     _via_util_page_show('page_fileuri_bulk_add', action_map);
   }.bind(this));
-  this.c.appendChild(add_media_bulk);
+  //this.c.appendChild(add_media_bulk);
 
   var del_view = _via_util_get_svg_button('micon_remove_circle', 'Remove the Current File', 'remove_media');
   del_view.addEventListener('click', this.via.vm._on_del_view.bind(this.via.vm));
-  this.c.appendChild(del_view);
+  //this.c.appendChild(del_view);
 }
 
 _via_control_panel.prototype._add_region_shape_selector = function() {
@@ -2136,7 +2160,7 @@ _via_control_panel.prototype._add_project_tools = function() {
 
   var import_export_annotation = _via_util_get_svg_button('micon_import_export', 'Import or Export Annotations');
   import_export_annotation.addEventListener('click', this._page_show_import_export.bind(this));
-  this.c.appendChild(import_export_annotation);
+  //this.c.appendChild(import_export_annotation);
 }
 
 _via_control_panel.prototype._page_show_import_export = function(d) {
@@ -4563,14 +4587,14 @@ function _via_file_annotator(view_annotator, data, vid, file_label, container) {
   this.conf = {};
   this.conf.CONTROL_POINT_RADIUS = 2;
   this.conf.CONTROL_POINT_COLOR  = 'red';
-  this.conf.CONTROL_POINT_CLICK_TOL = 6;
+  this.conf.CONTROL_POINT_CLICK_TOL = 8;
   this.conf.REGION_BOUNDARY_COLOR = 'red';
   this.conf.REGION_LINE_WIDTH = 2;
   this.conf.SEL_REGION_BOUNDARY_COLOR = 'black';
   this.conf.SEL_REGION_FILL_COLOR = '#808080';
   this.conf.SEL_REGION_FILL_OPACITY = 0.1;
   this.conf.SEL_REGION_LINE_WIDTH = 2;
-  this.conf.REGION_POINT_RADIUS = 6;
+  this.conf.REGION_POINT_RADIUS = 8;
   this.conf.FIRST_VERTEX_CLICK_TOL = 3;
   this.conf.FIRST_VERTEX_BOUNDARY_WIDTH = 1;
   this.conf.FIRST_VERTEX_BOUNDARY_COLOR = 'black';
@@ -10359,7 +10383,7 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
 
   this.c.setAttribute('style', 'grid-template-rows:1fr;')
   this.c.appendChild(this.view_content_container);
-
+  
   // occupy the full container with single image
   this.file_annotator = [];
   this.file_container = [];
@@ -10374,6 +10398,17 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   }.bind(this), function(err) {
     // handled by _via_file_annotator._file_load_show_error_page();
   }.bind(this));
+  // Add message
+
+  this.message_container = document.createElement('div');
+  this.message_container.setAttribute('id', '_via_message_container');
+  this.message_container.setAttribute('class', 'message_container');
+  this.message_container.addEventListener('click', _via_util_msg_hide);
+  this.message_panel = document.createElement('div');
+  this.message_panel.setAttribute('id', '_via_message');
+  this.message_container.appendChild(this.message_panel);
+  this.view_content_container.appendChild(this.message_container);
+
 }
 
 _via_view_annotator.prototype._view_annotate_single_video = function(vid) {
@@ -10591,6 +10626,18 @@ _via_view_annotator.prototype._view_split_content_container = function(container
       file_container[i][j].setAttribute('data-j', j);
       container.appendChild(file_container[i][j]);
     }
+    var landmark_msg = document.createElement('div');
+    landmark_msg.setAttribute('id', '_via_message_container2');
+    landmark_msg.setAttribute('class', 'message_container');
+    landmark_msg.addEventListener('click', _via_util_msg_hide);
+    var message_panel = document.createElement('div');
+    message_panel.setAttribute('id', '_via_message2');
+    message_panel.innerHTML = 'Para apagar um landmark, clique novamente sobre ele.';
+    landmark_msg.appendChild(message_panel);
+    container.appendChild(landmark_msg);
+
+    document.getElementById('_via_message_container2').style.display = 'block';
+    
   }
   container.setAttribute('style',
                          'grid-template-columns:repeat(' + ncol + ',1fr);' +
