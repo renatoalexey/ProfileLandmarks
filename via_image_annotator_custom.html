@@ -4587,14 +4587,14 @@ function _via_file_annotator(view_annotator, data, vid, file_label, container) {
   this.conf = {};
   this.conf.CONTROL_POINT_RADIUS = 2;
   this.conf.CONTROL_POINT_COLOR  = 'red';
-  this.conf.CONTROL_POINT_CLICK_TOL = 8;
+  this.conf.CONTROL_POINT_CLICK_TOL = 7;
   this.conf.REGION_BOUNDARY_COLOR = 'red';
   this.conf.REGION_LINE_WIDTH = 2;
   this.conf.SEL_REGION_BOUNDARY_COLOR = 'black';
   this.conf.SEL_REGION_FILL_COLOR = '#808080';
   this.conf.SEL_REGION_FILL_OPACITY = 0.1;
   this.conf.SEL_REGION_LINE_WIDTH = 2;
-  this.conf.REGION_POINT_RADIUS = 8;
+  this.conf.REGION_POINT_RADIUS = 7;
   this.conf.FIRST_VERTEX_CLICK_TOL = 3;
   this.conf.FIRST_VERTEX_BOUNDARY_WIDTH = 1;
   this.conf.FIRST_VERTEX_BOUNDARY_COLOR = 'black';
@@ -5428,9 +5428,7 @@ _via_file_annotator.prototype._rinput_mouseup_handler = function(e) {
   }
 
   if ( this.state_id === _VIA_RINPUT_STATE.REGION_SELECT_OR_DRAW_POSSIBLE ) {
-  	console.log('coco0');
     if ( ! e.shiftKey ) {
-    	console.log('coco12');
       this._creg_select_none();
     }
     this._tmpreg_clear();
@@ -5440,7 +5438,7 @@ _via_file_annotator.prototype._rinput_mouseup_handler = function(e) {
     this._smetadata_show();
     this._creg_draw_all();
     this._state_set( _VIA_RINPUT_STATE.REGION_SELECTED );
-    _via_util_msg_show('Region selected. Press <span class="key">Backspace</span> key to delete and arrow keys to move selected region. Use mouse wheel to update region label.', true);
+    //_via_util_msg_show('Region selected. Press <span class="key">Backspace</span> key to delete and arrow keys to move selected region. Use mouse wheel to update region label.', true);
     return;
   }
 
@@ -10617,6 +10615,7 @@ _via_view_annotator.prototype._view_has_only_audio = function(vid) {
 // view container
 //
 _via_view_annotator.prototype._view_split_content_container = function(container, file_container, nrow, ncol) {
+  _via_util_msg_show('Para apagar um landmark, clique novamente sobre ele.');
   for ( var i = 0; i < nrow; ++i ) {
     file_container[i] = [];
     for ( var j = 0; j < ncol; ++j ) {
@@ -10626,17 +10625,17 @@ _via_view_annotator.prototype._view_split_content_container = function(container
       file_container[i][j].setAttribute('data-j', j);
       container.appendChild(file_container[i][j]);
     }
-    var landmark_msg = document.createElement('div');
+    /*var landmark_msg = document.createElement('div');
     landmark_msg.setAttribute('id', '_via_message_container2');
     landmark_msg.setAttribute('class', 'message_container');
     landmark_msg.addEventListener('click', _via_util_msg_hide);
     var message_panel = document.createElement('div');
     message_panel.setAttribute('id', '_via_message2');
     message_panel.innerHTML = 'Para apagar um landmark, clique novamente sobre ele.';
-    landmark_msg.appendChild(message_panel);
-    container.appendChild(landmark_msg);
+    landmark_msg.appendChild(message_panel);*/
+    //container.appendChild(landmark_msg);
 
-    document.getElementById('_via_message_container2').style.display = 'block';
+    //document.getElementById('_via_message_container2').style.display = 'block';
     
   }
   container.setAttribute('style',
