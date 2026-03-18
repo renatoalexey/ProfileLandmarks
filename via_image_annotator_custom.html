@@ -3147,23 +3147,28 @@ _via_data.prototype.view_bulk_add_from_filelist = function(filelist) {
       var added_fid_list = [];
       var added_vid_list = [];
       for ( var i = 0; i < filelist.length; ++i ) {
-        var fid = this._file_get_new_id();
-        if ( filelist[i].loc === _VIA_FILE_LOC.LOCAL ) {
-          this.file_ref[fid] = filelist[i].src; // local file ref. stored separately
-          filelist[i].src = '';                 // no need to store duplicate of file ref.
-        }
-        this.store.file[fid] = new _via_file(fid,
-                                             filelist[i].fname,
-                                             filelist[i].type,
-                                             filelist[i].loc,
-                                             filelist[i].src);
-
         var vid = this._view_get_new_id();
-        this.store.view[vid] = new _via_view( [ fid ] ); // view with single file
-        this.store.project.vid_list.push(vid);
-
-        added_fid_list.push(fid);
         added_vid_list.push(vid);
+
+        for ( var j = i; j < i + 2 ; ++j ) {
+        
+            var fid = this._file_get_new_id();
+            if ( filelist[j].loc === _VIA_FILE_LOC.LOCAL ) {
+              this.file_ref[fid] = filelist[j].src; // local file ref. stored separately
+              filelist[j].src = '';                 // no need to store duplicate of file ref.
+            }
+            this.store.file[fid] = new _via_file(fid,
+                                                 filelist[j].fname,
+                                                 filelist[j].type,
+                                                 filelist[j].loc,
+                                                 filelist[j].src);
+
+            this.store.view[vid] = new _via_view( [ fid ] ); // view with single file
+            this.store.project.vid_list.push(vid);
+
+            added_fid_list.push(fid);
+        }
+        i ++;
       }
       var payload = { 'vid_list':added_vid_list, 'fid_list':added_fid_list };
       this.emit_event( 'view_bulk_add', payload );
@@ -10386,7 +10391,7 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this.file_annotator = [];
   this.file_container = [];
   this.view_content_container.innerHTML = '';
-  this._view_split_content_container(this.view_content_container, this.file_container, 1, 2);
+  this._view_split_content_container(this.view_content_container, this.file_container, 1, 1);
 
   this.file_annotator[0] = [];
   var vid0 = this.d.view_get_file_vid( this.d.store.view[vid].fid_list[0] );
