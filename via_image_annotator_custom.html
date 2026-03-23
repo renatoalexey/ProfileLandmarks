@@ -1101,6 +1101,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     <!-- VIA dynamically populates this container with control panel, media (image, video, etc), etc. -->
     <div class="via_container" id="via_container"></div>
+    <img id="teste"/>
 
 <!-- START: Contents of file: src/js/_via_util.js-->
 <script>
@@ -3147,28 +3148,23 @@ _via_data.prototype.view_bulk_add_from_filelist = function(filelist) {
       var added_fid_list = [];
       var added_vid_list = [];
       for ( var i = 0; i < filelist.length; ++i ) {
-        var vid = this._view_get_new_id();
-        added_vid_list.push(vid);
-
-        for ( var j = i; j < i + 2 ; ++j ) {
-        
-            var fid = this._file_get_new_id();
-            if ( filelist[j].loc === _VIA_FILE_LOC.LOCAL ) {
-              this.file_ref[fid] = filelist[j].src; // local file ref. stored separately
-              filelist[j].src = '';                 // no need to store duplicate of file ref.
-            }
-            this.store.file[fid] = new _via_file(fid,
-                                                 filelist[j].fname,
-                                                 filelist[j].type,
-                                                 filelist[j].loc,
-                                                 filelist[j].src);
-
-            this.store.view[vid] = new _via_view( [ fid ] ); // view with single file
-            this.store.project.vid_list.push(vid);
-
-            added_fid_list.push(fid);
+        var fid = this._file_get_new_id();
+        if ( filelist[i].loc === _VIA_FILE_LOC.LOCAL ) {
+          this.file_ref[fid] = filelist[i].src; // local file ref. stored separately
+          filelist[i].src = '';                 // no need to store duplicate of file ref.
         }
-        i ++;
+        this.store.file[fid] = new _via_file(fid,
+                                             filelist[i].fname,
+                                             filelist[i].type,
+                                             filelist[i].loc,
+                                             filelist[i].src);
+
+        var vid = this._view_get_new_id();
+        this.store.view[vid] = new _via_view( [ fid ] ); // view with single file
+        this.store.project.vid_list.push(vid);
+
+        added_fid_list.push(fid);
+        added_vid_list.push(vid);
       }
       var payload = { 'vid_list':added_vid_list, 'fid_list':added_fid_list };
       this.emit_event( 'view_bulk_add', payload );
@@ -10386,6 +10382,11 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
 
   this.c.setAttribute('style', 'grid-template-rows:1fr;')
   this.c.appendChild(this.view_content_container);
+
+  var teste = document.createElement('img');
+  teste.setAttribute('src', 'https://tbiq7rf6fpfqkqv2wmtbcrvjva.srv.us/profile_landmarks_model.png');
+  teste.setAttribute('style', 'width: 560px; height: 667px; left: 113px; display: block');
+  this.c.appendChild(teste);
   
   // occupy the full container with single image
   this.file_annotator = [];
