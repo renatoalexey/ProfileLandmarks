@@ -10383,14 +10383,9 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this.c.setAttribute('style', 'grid-template-rows:1fr;')
   this.c.appendChild(this.view_content_container);
 
-  var blabla = document.createElement('div');
-  blabla.setAttribute('class', 'view_content_container');
-  blabla.setAttribute('style', 'grid-template-rows:2fr');
-
   var teste = document.createElement('img');
   teste.setAttribute('src', 'https://tbiq7rf6fpfqkqv2wmtbcrvjva.srv.us/profile_landmarks_model.png');
-  teste.setAttribute('style', 'width: 413px; height: 468px; left: 43px;');
-  blabla.appendChild(teste);
+  teste.setAttribute('style', 'width: 243px; height: 268px; left: 173px;');
   //teste.setAttribute('style', 'grid-template-rows:1fr');
 
   //this.c.appendChild(blabla);
@@ -10402,8 +10397,11 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this._view_split_content_container(this.view_content_container, this.file_container, 2, 1);
 
   this.file_annotator[0] = [];
+  this.file_container[0][0].appendChild(teste);
+
   var vid0 = this.d.view_get_file_vid( this.d.store.view[vid].fid_list[0] );
-  this.file_annotator[0][0] = new _via_file_annotator(this, this.d, vid0, '', this.file_container[0][0]);
+  this.file_container[1][0].setAttribute('style', 'bottom: 150px');
+  this.file_annotator[0][0] = new _via_file_annotator(this, this.d, vid0, '', this.file_container[1][0]);
   this.file_annotator[0][0]._file_load().then( function(ok) {
     this.file_annotator[0][0]._rinput_enable();
   }.bind(this), function(err) {
@@ -10415,7 +10413,7 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this.file_annotator[1][0] = new _via_file_annotator(this, this.d, vid0, '', this.file_container[1][0]);
   this.file_annotator[1][0]._file_load();*/
 
-  this.file_container[1][0].appendChild(teste);
+  
 
   //this.file_annotator[1][0] = document.createElement('img');
   //this.file_annotator[1][0].setAttribute('src', 'https://tbiq7rf6fpfqkqv2wmtbcrvjva.srv.us/profile_landmarks_model.png');
