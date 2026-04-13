@@ -8,13 +8,16 @@ from src.amazon.correspondent_amazon_type import CorrespondentAmazon
 
 file_library_name = {"cfp_fa_result.txt": "Face Alignment", "cfp_mlkit_result.txt": "ML Kit", "cfp_amazon_result.txt": "Amazon Rekognition"}
 
-def print_pile_graph(means, graph_name, positions=None, x_label=None):
+def print_pile_graph(means, prefix, label, positions=None, x_label=None):
+    graph_name = f"{prefix}{label}"
+
     plt.figure(figsize=(12, 5))
     plt.boxplot(means, positions, tick_labels=positions, whis=2.5)
     plt.xlabel(x_label, fontsize=15)
-    plt.ylabel('Distances means', fontsize=15)
+    plt.ylabel('Médias das distâncias', fontsize=15)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
+    plt.title(label, fontsize=16)
 
     plt.savefig(
         f'{graph_name}.png',
@@ -23,8 +26,8 @@ def print_pile_graph(means, graph_name, positions=None, x_label=None):
 def print_graph(means, graph_name, positions=None, x_label=None):
     plt.figure(figsize=(12, 7))
     plt.boxplot(means, positions, tick_labels=positions, whis=2.5)
-    plt.xlabel(x_label)
-    plt.ylabel('Distances means')
+    plt.xlabel(x_label, fontsize=14)
+    plt.ylabel('Médias das distâncias', fontsize=14)
 
     plt.savefig(
         f'{graph_name}.png',
@@ -95,7 +98,7 @@ def all_distances_boxplot():
 
     #for teste in distances_tools_list:
         #print(np.mean(teste)) 
-    print_graph(distances_tools_list, "distances", label_names, "Bibliotecas")
+    print_graph(distances_tools_list, "distances", label_names, "Ferramentas")
 
 def distances_per_point(file_path, keys):
     lines = get_file_lines(file_path)
@@ -117,7 +120,7 @@ def distances_per_point(file_path, keys):
 
     label = get_library_from_path(file_path)
     keys = [ v + 1 for v in keys ]
-    print_pile_graph(point_distances_list, f"points_distances_{label}", keys, "Labeled landmarks")
+    print_pile_graph(point_distances_list, "points_distances_", label, keys,  r'$\it{Landmarks}$ rotulados')
 
 def distances_per_resolution_area(file_path):
     lines = get_file_lines(file_path)
@@ -162,7 +165,7 @@ def distances_per_resolution_area(file_path):
         ocorrencias = [t[3] for t in teste].count("Multiple")
         #print(ocorrencias)
     
-    print_pile_graph(values, f"resolutions_distances_{label}", labels, "Resolutions")
+    print_pile_graph(values, "resolutions_distances_", label, labels, r'Total de $\it{pixels}$')
 
 def get_rel_interval(file_path):
     resolution_area_list = []
@@ -222,8 +225,8 @@ def accuracy_face_per_resolution():
     #plt.xticks(range(len(blabla)), blabla)
     print(labels)
     plt.xticks(labels)
-    plt.xlabel("Total pixels")
-    plt.ylabel("Detection Percentage(%)")
+    plt.xlabel(r'Total de $\it{pixels}$')
+    plt.ylabel("Detecção Facial(%)")
     plt.legend()
     # Mostra o gráfico
     #plt.show()
@@ -270,8 +273,8 @@ for result_path in result_paths_correspondent:
 #file_path = "result/cfp_amazon_result.txt"
 
 #tests_point_fa()
-all_distances_boxplot()
-accuracy_face_per_resolution()
+#all_distances_boxplot()
+#accuracy_face_per_resolution()
 #teste()
 #teste_2()
 #get_match_result("name: 083\profile\02.jpg, resolution: 1336x1220, color: RGB, face detected: Multiple, distances: [], mean: 0")
