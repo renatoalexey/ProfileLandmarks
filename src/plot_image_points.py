@@ -17,7 +17,8 @@ ground_truth_file_path = 'F:\\Bases\\cfp-dataset\\Data\\Fiducials\\001\\profile\
 img_path = core.get_image_path(ground_truth_file_path)
 
 def tests_face_alignment():
-    img_path = '/home/renatoalexey/Pictures/gabriel_esq.png'
+    #img_path = '/home/renatoalexey/Pictures/gabriel_esq.png'
+    img_path = 'C:\\Users\\renat\\OneDrive\\Imagens\\mateus_leu_esq.png'
     #ground_truth_points_list, image = cfp.get_ground_truth_points(img_path)
     image = cv2.imread(img_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)      
@@ -29,8 +30,8 @@ def tests_face_alignment():
     # elif face_detected == FaceType.MULTIPLE:
     #     print('adsf')
     color = image.shape[2]
-    #print("Face Detected: ", fa_points_list[2])    
-    prints_library_graphic(image, fa_points_list[0])
+    print("Face Detected: ", fa_points_list[2])    
+    prints_library_graphic(image, fa_points_list)
     #prints_graphic(image, fa_points_list[0], correspondent_points, ground_truth_points_list)
     #all_points(image, ground_truth_points_list, [])
 def tests_amazon():
@@ -69,16 +70,35 @@ def prints_library_graphic(img, library_points_list):
     fig, ax = plt.subplots()
     ax.imshow(img)   
     plt.imshow(img)
+    for library_points in library_points_list[2]:
+        bounding = library_points
+        x = bounding[0]
+        y = bounding[1]
+        largura = bounding[2] - x
+        altura = bounding[3] - y
+        # Cria retângulo
+        bbox = patches.Rectangle(
+            (x, y),           # posição inicial
+            largura,
+            altura,
+            linewidth=2,
+            edgecolor='red',
+            facecolor='none'
+        )
+       # ax.add_patch(bbox)
     
     teste = [4, 8, 10, 11, 13, 31,28,36, 23, 25, 26,48, 44, 46, 51, 59, 65]
+    print(library_points_list[0])
     for library_points in library_points_list:
-        for i, library_point in enumerate(library_points, start=1):
+       
+        for i, library_point in enumerate(library_points[0], start=1):
             if (i not in teste):
                 continue
-            print(f"Library point: {library_point}")    
+            #print(f"Library point: {library_point}")    
             a, b = library_point
             plt.scatter(a, b, color="blue", s=10)
             plt.annotate(str(i), (a, b), textcoords="offset points", xytext=(0,5), ha='center', color="blue", fontsize=8)
+        break
     
     plt.imshow(img)
     plt.axis("off")
