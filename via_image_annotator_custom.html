@@ -4588,14 +4588,14 @@ function _via_file_annotator(view_annotator, data, vid, file_label, container) {
   this.conf = {};
   this.conf.CONTROL_POINT_RADIUS = 2;
   this.conf.CONTROL_POINT_COLOR  = 'red';
-  this.conf.CONTROL_POINT_CLICK_TOL = 7;
+  this.conf.CONTROL_POINT_CLICK_TOL = 4;
   this.conf.REGION_BOUNDARY_COLOR = 'red';
   this.conf.REGION_LINE_WIDTH = 2;
   this.conf.SEL_REGION_BOUNDARY_COLOR = 'black';
   this.conf.SEL_REGION_FILL_COLOR = '#808080';
   this.conf.SEL_REGION_FILL_OPACITY = 0.1;
   this.conf.SEL_REGION_LINE_WIDTH = 2;
-  this.conf.REGION_POINT_RADIUS = 7;
+  this.conf.REGION_POINT_RADIUS = 4;
   this.conf.FIRST_VERTEX_CLICK_TOL = 3;
   this.conf.FIRST_VERTEX_BOUNDARY_WIDTH = 1;
   this.conf.FIRST_VERTEX_BOUNDARY_COLOR = 'black';
@@ -10383,9 +10383,15 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this.c.setAttribute('style', 'grid-template-rows:1fr;')
   this.c.appendChild(this.view_content_container);
 
-  var teste = document.createElement('img');
-  teste.setAttribute('src', 'https://tbiq7rf6fpfqkqv2wmtbcrvjva.srv.us/profile_landmarks_model.png');
-  teste.setAttribute('style', 'width: 243px; height: 268px; left: 173px;');
+  let model_name = 'profile_landmarks_model_esq';
+
+  if (vid%2 == 0) {
+    model_name = 'profile_landmarks_model_dir';
+  }
+
+  var img_model = document.createElement('img');
+  img_model.setAttribute('src', `${model_name}.png`);
+  img_model.setAttribute('style', 'width: 243px; height: 268px; left: 173px;');
   //teste.setAttribute('style', 'grid-template-rows:1fr');
 
   //this.c.appendChild(blabla);
@@ -10397,7 +10403,7 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   this._view_split_content_container(this.view_content_container, this.file_container, 2, 1);
 
   this.file_annotator[0] = [];
-  this.file_container[0][0].appendChild(teste);
+  this.file_container[0][0].appendChild(img_model);
 
   var vid0 = this.d.view_get_file_vid( this.d.store.view[vid].fid_list[0] );
   this.file_container[1][0].setAttribute('style', 'bottom: 150px');
@@ -10412,8 +10418,6 @@ _via_view_annotator.prototype._view_annotate_single_image = function(vid) {
   //var vid0 = this.d.view_get_file_vid( this.d.store.view[vid].fid_list[0] );
   this.file_annotator[1][0] = new _via_file_annotator(this, this.d, vid0, '', this.file_container[1][0]);
   this.file_annotator[1][0]._file_load();*/
-
-  
 
   //this.file_annotator[1][0] = document.createElement('img');
   //this.file_annotator[1][0].setAttribute('src', 'https://tbiq7rf6fpfqkqv2wmtbcrvjva.srv.us/profile_landmarks_model.png');
