@@ -13,25 +13,38 @@ def run():
         with open(json_fullpath, 'r', encoding='utf-8') as file:
             data = json.load(file)
 
-        for i, item in enumerate(data['metadata'].values(), start=0):
-            vid = item['vid']
+        json_info = {}
+
+        for item in data['file'].values():
+            json_info[item['fid']] = item['fname']
+        
+        vid = -1
+        i = 0
+        for item in data['metadata'].values():
+            if vid != item['vid']:
+                i = 0
+                vid = item['vid']
             x, y = item['xy'][1], item['xy'][2]
+
+            img_name = json_info[vid] 
             
-            if vid not in pontos_por_imagem:
-                pontos_por_imagem[vid] = []
-            if (pontos_por_imagem[vid] and i == 0):
-                x += pontos_por_imagem[vid][i][0]
-                y += pontos_por_imagem[vid][i][1]
-                pontos_por_imagem[vid][i] = (x,y)
+            if img_name not in pontos_por_imagem:
+                pontos_por_imagem[img_name] = [(0, 0)]
+            if (i < len(pontos_por_imagem[img_name])):
+                x += pontos_por_imagem[img_name][i][0]
+                y += pontos_por_imagem[img_name][i][1]
+                pontos_por_imagem[img_name][i] = (x,y)
             else:
-                pontos_por_imagem[vid].append((x, y))
+                pontos_por_imagem[img_name].append((x, y))
+            i += 1
         
         #all_images_points.append(pontos_por_imagem)
         json_count += 1
 
-    #print(pontos_por_imagem)
+    print(pontos_por_imagem)
+    print(json_count)
     ground_truth_points =  {
-        key: [(x / 2, y / 2) for x, y in points]
+        key: [(x / json_count, y / json_count) for x, y in points]
         for key, points in pontos_por_imagem.items()
     }
 
