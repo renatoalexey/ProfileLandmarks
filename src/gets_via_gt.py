@@ -3,7 +3,7 @@ import json
 
 json_folder = "via_json"
 
-def run():
+def gets_gt():
     all_images_points = []
     pontos_por_imagem = {}
     json_count = 0
@@ -41,13 +41,14 @@ def run():
         #all_images_points.append(pontos_por_imagem)
         json_count += 1
 
-    print(pontos_por_imagem)
-    print(json_count)
+    #print(pontos_por_imagem)
+    #print(json_count)
     ground_truth_points =  {
         key: [(x / json_count, y / json_count) for x, y in points]
         for key, points in pontos_por_imagem.items()
     }
 
-    print(ground_truth_points)    
+    #print(ground_truth_points)    
+    return ground_truth_points
 
-run()
+gets_gt()
