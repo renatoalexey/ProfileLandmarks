@@ -184,4 +184,4 @@ def calcs_landmarks_inside(ground_truth_pts, bounding_box):
         if x >= bounding_box[0] and x <= bounding_box[2] and y >= bounding_box[1] and y <= bounding_box[3]:
             landmarks_inside += 1
 
-    return landmarks_inside*100/30
+    return landmarks_inside*100/4
